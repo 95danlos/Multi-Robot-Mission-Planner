@@ -2,12 +2,12 @@ import os, sys, inspect, ast, time, threading
 import http.server, webbrowser
 from .websocket_server import WebsocketServer
 
-"""
+
 PATH = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
 
 print("serving page from",PATH)
 os.chdir(PATH)
-"""
+
 
 class CombiServer(WebsocketServer):
 	def __init__(self, http_port, websocket_port):
