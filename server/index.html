@@ -79,20 +79,30 @@ I (Joram Brenz) just put it together and made it work with the MultiDroneCoordin
 			var startposmarker = L.marker([0,0]);
 			var startpos = null;
 			var lines = [];
-			
+			var prevPos = null; 
+
 			function onMapClick(e) {
 				var newpos = e.latlng;
+
+
+				//First time
 				if (startpos == null) {
 					startpos = newpos;
 					startposmarker.setLatLng(startpos);
 					startposmarker.addTo(mymap);
 				}
+
+				//All the other times
 				else {
+				
+					if(prevPos !== null) {
+						startpos = prevPos; 
+					}
 					var line = L.polyline([startpos, newpos]);
 					line.addTo(mymap);
 					lines.push(line);
-					startpos = null;
 					startposmarker.remove();
+					prevPos = newpos; 
 				}
 			}
 
