@@ -505,15 +505,36 @@ I (Joram Brenz) just put it together and made it work with the MultiDroneCoordin
 			}
 
 			function fly() {
-				var positions = [];
+				var linetasks = [];
 				while (lines.length) {
 					var line = lines.pop();
 					console.log(line.getLatLngs()); 
 					line.remove();
-					positions.push(line.getLatLngs());
+					linetasks.push(line.getLatLngs());
 				}
 
-				tasks.push(positions) 
+				tasks.push(linetasks) 
+
+				var polygontasks = []; 
+				var j = 0; 
+				while (j < polygons.length) {
+					polygon = polygons[j]
+					console.log(polygons.length)
+
+					var i = 0; 
+
+					while( i < polygon.length) {
+						var line = polygon[i];
+						line.remove()
+						polygon[i] = line.getLatLngs(); 
+
+						i++;  
+					}
+					j++; 
+				}
+
+				console.log(polygons.length)
+				tasks.push(polygons)
 
 
 				ws.send(JSON.stringify([0, tasks]));

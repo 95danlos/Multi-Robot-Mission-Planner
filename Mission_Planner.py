@@ -12,6 +12,7 @@ server = combiserver.CombiServer(HTTP_PORT,WEBSOCKET_PORT)
 
 vehicles = []
 line_task = []
+polygon_task = []
 
 
 def main():
@@ -97,12 +98,23 @@ def message_received(client, server, message):
 
 		""" adding new lines that user draw on map """
 		tasks = ast.literal_eval(message)[1]
-		print(tasks)
 		lines = tasks[0]
+		polygons = tasks[1]
+
+		print(lines) 
 		lines = [[dronekit.LocationGlobal(point["lat"],point["lng"],20) for point in line] for line in lines]
-		print(lines)
+
 		line_task.extend(lines)
 
+
+
+		#Polytask
+
+		poly_tasks = []
+		for polygon in polygons: 
+			polygon = [[dronekit.LocationGlobal(point["lat"],point["lng"],20) for point in line] for line in polygon]
+			poly_tasks.append(polygon)
+					
 	if(message_type == 1):
 
 		""" Change Parameters """
