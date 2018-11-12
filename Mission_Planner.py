@@ -96,8 +96,9 @@ def message_received(client, server, message):
 	if(message_type == 0):
 
 		""" adding new lines that user draw on map """
-		lines = ast.literal_eval(message)[1]
-		print(lines)
+		tasks = ast.literal_eval(message)[1]
+		print(tasks)
+		lines = tasks[0]
 		lines = [[dronekit.LocationGlobal(point["lat"],point["lng"],20) for point in line] for line in lines]
 		print(lines)
 		line_task.extend(lines)

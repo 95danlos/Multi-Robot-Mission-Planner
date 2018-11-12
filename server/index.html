@@ -290,6 +290,9 @@ I (Joram Brenz) just put it together and made it work with the MultiDroneCoordin
 				font-size: 18px; 
 				opacity: 0.7; 
 			}
+			.poly {
+				display: none; 
+			}
 		</style>
 
 	</head>
@@ -302,6 +305,7 @@ I (Joram Brenz) just put it together and made it work with the MultiDroneCoordin
 			<input id="submitButton" class="button_fly" type="button" value="Fly" onclick="fly();" />
 			<input id="lineTask" class="button_task" type="button" value="Line task" onclick="setTask('line'); " />
 			<input id="polyTask" class="button_task" type="button" value="Poly task" onclick="setTask('poly'); " />
+			<input id="savePoly" class="button_task poly" type="button" value="Save Polytask" onclick="savePoly(); "/>
 			<input id="pickupTask" class="button_task" type="button" value="Pick-up task" onclick="setTask('pickup');" />
 		</div>
 
@@ -381,7 +385,13 @@ I (Joram Brenz) just put it together and made it work with the MultiDroneCoordin
 			var startposmarker = L.marker([0,0]);
 			var startpos = null;
 			var lines = [];
+			var polylines = []; 
+			var polygons = []; 
 			var prevPos = null; 
+
+			//This is the array that will be sent to the server. It will contain all the different tasks, each index corresponding to a specific task
+			//0 = linetask, 1 = polygontask, 2 = pickup task (not implemented)
+			var tasks = []; 
 			
 			function doPolyTask(npos) {
 				var newpos = npos
@@ -400,7 +410,7 @@ I (Joram Brenz) just put it together and made it work with the MultiDroneCoordin
 					}
 					var line = L.polyline([startpos, newpos]);
 					line.addTo(mymap);
-					lines.push(line);
+					polylines.push(line);
 					startposmarker.remove();
 					prevPos = newpos; 
 				}
@@ -420,6 +430,19 @@ I (Joram Brenz) just put it together and made it work with the MultiDroneCoordin
 					startpos = null;
 					startposmarker.remove();
 				}
+			}
+
+			function savePoly() {
+
+
+				polygons.push(polylines)
+
+				polylines = []
+
+				console.log(polygons[0])
+
+				document.getElementById("polyTask").style.display="block"; 
+				document.getElementById("savePoly").style.display="none"; 
 			}
 
 			function onMapClick(e) {
@@ -485,11 +508,15 @@ I (Joram Brenz) just put it together and made it work with the MultiDroneCoordin
 				var positions = [];
 				while (lines.length) {
 					var line = lines.pop();
+					console.log(line.getLatLngs()); 
 					line.remove();
 					positions.push(line.getLatLngs());
 				}
 
-				ws.send(JSON.stringify([0, positions]));
+				tasks.push(positions) 
+
+
+				ws.send(JSON.stringify([0, tasks]));
 			}
 
 			function setTask(task) {
@@ -501,7 +528,12 @@ I (Joram Brenz) just put it together and made it work with the MultiDroneCoordin
 						break
 					case "poly":
 						console.log("kake")
+						prevPos = null
 						this.task="poly"
+
+						document.getElementById("polyTask").style.display="none"; 
+						document.getElementById("savePoly").style.display="block"; 
+
 						break
 					case "pickup":
 						this.task = "pickup"
