@@ -30,7 +30,6 @@ class CombiServer(WebsocketServer):
 	# Called for every client disconnecting
 	def client_left(client, server):
 		print("Client(%d) disconnected" % client['id'])
-		raise KeyboardInterrupt("Frontend was closed")
 
 	@staticmethod
 	# Called when a client sends a message

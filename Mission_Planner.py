@@ -11,7 +11,7 @@ UAV_BASE_PORT = 14550
 server = combiserver.CombiServer(HTTP_PORT,WEBSOCKET_PORT)
 
 vehicles = []
-undistributed_lines = []
+line_task = []
 
 
 def main():
@@ -44,17 +44,17 @@ def main():
 							free_vehicles.append(vehicle)
 
 				# Distribute new tasks	
-				distribute_tasks(free_vehicles, undistributed_lines)
+				distribute_tasks(free_vehicles, line_task)
 				time.sleep(1)
 	except:
   		print("An exception occurred")			
 				
 
 
-def distribute_tasks(free_vehicles, undistributed_lines):
+def distribute_tasks(free_vehicles, line_task):
 	
 	# While there are free vehicles and undistributed tasks
-	while free_vehicles and undistributed_lines:
+	while free_vehicles and line_task:
 		v_best = None #vehicle
 		l_best = None #line
 		d_best = None
@@ -62,7 +62,7 @@ def distribute_tasks(free_vehicles, undistributed_lines):
 
 		# Find the shortes distance between a free vehicle and an undistributed task
 		for vehicle in free_vehicles:
-			for line in undistributed_lines:
+			for line in line_task:
 				d_s = Drone_Services.distance(vehicle.location.global_frame, line[0])
 				d_e = Drone_Services.distance(vehicle.location.global_frame, line[1])
 				d = min(d_e, d_s)
@@ -76,7 +76,7 @@ def distribute_tasks(free_vehicles, undistributed_lines):
 		
 		# Remove the vehicle from free vehicles and remove the task from undistributed tasks
 		free_vehicles.remove(v_best)
-		undistributed_lines.remove(l_best)
+		line_task.remove(l_best)
 
 		# Swap the line start and end position if the end position is closest
 		if swap:
@@ -86,8 +86,6 @@ def distribute_tasks(free_vehicles, undistributed_lines):
 		v_best.nextlocations.extend(l_best)
 		print("3")
 		v_best.simple_goto(v_best.nextlocations[0])
-
-
 
 # Called when a client clicks on fly button
 def message_received(client, server, message):
@@ -99,8 +97,10 @@ def message_received(client, server, message):
 
 		""" adding new lines that user draw on map """
 		lines = ast.literal_eval(message)[1]
+		print(lines)
 		lines = [[dronekit.LocationGlobal(point["lat"],point["lng"],20) for point in line] for line in lines]
-		undistributed_lines.extend(lines)
+		print(lines)
+		line_task.extend(lines)
 
 	if(message_type == 1):
 

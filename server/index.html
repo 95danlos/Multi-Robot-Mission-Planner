@@ -41,20 +41,6 @@ I (Joram Brenz) just put it together and made it work with the MultiDroneCoordin
 				z-index:0;
 			}
 			
-			.buttonBox_fly{
-				position:absolute;
-				top:20px;
-				right:20px;
-				z-index:1000;
-				height: 50px;
-				width: 80px;
-			}
-			.button_fly{
-				height: 100%;
-				width: 100%;
-				font-size: 20px;
-				opacity: 0.7;
-			}
 			.buttonBox_search{
 				position:absolute;
 				top:80px;
@@ -281,6 +267,29 @@ I (Joram Brenz) just put it together and made it work with the MultiDroneCoordin
 				opacity: 0.7;
 				display: none
 			}
+
+
+			.buttonBox_fly{
+				position:absolute;
+				top:20px;
+				right:20px;
+				z-index:1000;
+				height: 50px;
+				width: 150px;
+			}
+			.button_fly{
+				height: 100%;
+				width: 100%;
+				font-size: 20px;
+				opacity: 0.7;
+			}
+
+			.button_task {
+				height: 70%; 
+				width: 100%; 
+				font-size: 18px; 
+				opacity: 0.7; 
+			}
 		</style>
 
 	</head>
@@ -291,11 +300,9 @@ I (Joram Brenz) just put it together and made it work with the MultiDroneCoordin
 		-->
 		<div class="buttonBox_fly">
 			<input id="submitButton" class="button_fly" type="button" value="Fly" onclick="fly();" />
-		</div>
-		<div id="buttonBox">
-			<input id="submitButton" type="button" value="Fly!" onclick="fly();" />
-			<input id="lineTask" type="button" value="Line task" onclick="setTask('line')">
-			<input id="polyTask" type="button" value="Poly task" onclick="setTask('poly')">
+			<input id="lineTask" class="button_task" type="button" value="Line task" onclick="setTask('line'); " />
+			<input id="polyTask" class="button_task" type="button" value="Poly task" onclick="setTask('poly'); " />
+			<input id="pickupTask" class="button_task" type="button" value="Pick-up task" onclick="setTask('pickup');" />
 		</div>
 
 		<!--
@@ -355,8 +362,7 @@ I (Joram Brenz) just put it together and made it work with the MultiDroneCoordin
 		<script>
 
 			//What task the user wants to create. Default is linetask
-			var lineTask = true
-			var polyTask = false
+			var task = "line"
 
 			//60.396346, 5.321288 # Bergen
 			//37.619374, -122.376637 # San Francisco
@@ -419,12 +425,17 @@ I (Joram Brenz) just put it together and made it work with the MultiDroneCoordin
 			function onMapClick(e) {
 				var newpos = e.latlng;
 
-				if(polyTask) {
+				console.log("Task:" + task)
+				if(task === "poly") {
 					doPolyTask(newpos) 
 				}
 
-				else if(lineTask) {
+				else if(task === "line") {
 					doLineTask(newpos)
+				}
+
+				else if(task === "pickup") {
+					doPickupTask(newpos)
 				}
 				
 			}
@@ -477,23 +488,26 @@ I (Joram Brenz) just put it together and made it work with the MultiDroneCoordin
 					line.remove();
 					positions.push(line.getLatLngs());
 				}
+
 				ws.send(JSON.stringify([0, positions]));
 			}
 
 			function setTask(task) {
 				console.log("Setting task: " + task)
+				startpos = null
 				switch(task) {
 					case "line":
-						startpos = null
-						lineTask = true
-						polyTask = false
+						this.task = "line"
 						break
 					case "poly":
-						lineTask = false
-						polyTask=true
+						console.log("kake")
+						this.task="poly"
+						break
+					case "pickup":
+						this.task = "pickup"
+						break
 				} 
 			}
-
 
 			function update_drone_position(data) {
 					var id = data[0];

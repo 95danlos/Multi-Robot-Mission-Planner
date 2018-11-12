@@ -138,3 +138,7 @@ def distance(location1, location2):
 		print("ValueError in distance calculation for ", x1,y1, "to", x2,y2)
 		d = 0.0
 	return d
+
+
+def is_on_line(drone, location1, location2): 
+	return distance(location1, drone) + distance(location2, drone) == distance(location1, location2)
