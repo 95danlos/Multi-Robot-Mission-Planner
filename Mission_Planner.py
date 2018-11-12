@@ -85,8 +85,9 @@ def distribute_tasks(free_vehicles, line_task):
 
 		# Add task to the vehicle's task list and start the task
 		v_best.nextlocations.extend(l_best)
-		print("3")
 		v_best.simple_goto(v_best.nextlocations[0])
+
+
 
 # Called when a client clicks on fly button
 def message_received(client, server, message):
@@ -115,6 +116,8 @@ def message_received(client, server, message):
 			polygon = [[dronekit.LocationGlobal(point["lat"],point["lng"],20) for point in line] for line in polygon]
 			poly_tasks.append(polygon)
 					
+	
+	# New Parameter recieved
 	if(message_type == 1):
 
 		""" Change Parameters """
@@ -124,6 +127,23 @@ def message_received(client, server, message):
 		new_max_speed = ast.literal_eval(message)[2]
 		vehicle.max_speed = float(new_max_speed)
 		vehicle.groundspeed = float(new_max_speed)
+
+		new_max_battery_time = ast.literal_eval(message)[3]
+		vehicle.max_battery_time = float(new_max_battery_time)
+		vehicle.current_battery = float(new_max_battery_time)
+		vehicle.start_up_time = time.time()
+
+		new_max_carry_weight = ast.literal_eval(message)[4]
+		vehicle.max_carry_weight = float(new_max_carry_weight)
+	
+
+	# Reacharge battery
+	if(message_type == 2):
+		vehicle_id = ast.literal_eval(message)[1]
+		vehicle = Drone_Services.find_vehicle_by_id(vehicles, vehicle_id)
+
+		vehicle.current_battery = vehicle.max_battery_time
+		vehicle.start_up_time = time.time()
 	
 
 

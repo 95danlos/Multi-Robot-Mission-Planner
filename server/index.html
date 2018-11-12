@@ -191,6 +191,16 @@ I (Joram Brenz) just put it together and made it work with the MultiDroneCoordin
 				font-size: 40px;
 				color: purple;
 			}
+			.reacharge_battery_button{
+				position:absolute;
+				bottom:20px;
+				left:20px;
+				height: 30px;
+				width: 150px;
+				z-index:1001;
+				font-size: 15px;
+				opacity: 0.7;
+			}
 			.parameter_tab{
 				position:absolute;
 				top:80px;
@@ -227,33 +237,34 @@ I (Joram Brenz) just put it together and made it work with the MultiDroneCoordin
 			}
 			.speed_parameter_change_button{
 				position:absolute;
-				top:20px;
+				top:35px;
 				left:250px;
 				height: 35px;
 				width: 80px;
 				z-index:1000;
 				font-size: 15px;
+				opacity: 0.8;
 			}
 			.speed_parameter_change_button_confirm{
 				position:absolute;
-				top:20px;
+				top:35px;
 				left:250px;
 				height: 35px;
 				width: 80px;
 				z-index:1000;
 				font-size: 15px;
-				opacity: 0.7;
+				opacity: 0.8;
 				display: none
 			}
 			.speed_parameter_change_button_cancel{
 				position:absolute;
-				top:20px;
+				top:35px;
 				left:150px;
 				height: 35px;
 				width: 80px;
 				z-index:1000;
 				font-size: 15px;
-				opacity: 0.7;
+				opacity: 0.8;
 				display: none
 			}
 			.speed_parameter_change_input{
@@ -318,7 +329,8 @@ I (Joram Brenz) just put it together and made it work with the MultiDroneCoordin
 			<div id="current_vehicle_text" class="current_vehicle_text">1</div>
 			<input id="flight_data_button" class="flight_data_button" type="button" value="Flight Data" onclick="show_flight_data_tab();" />
 			<input id="parameter_button" class="parameter_button" type="button" value="Parameters" onclick="show_parameter_tab();" />
-
+			<input id="reacharge_battery_button" class="reacharge_battery_button" type="button" value="Reacharge Battery" onclick="reacharge_battery();" />
+			
 			<div id="flight_data_tab" class="flight_data_tab">
 				<div id="altitude_text" class="altitude_text">Altitude (m)</div>
 				<div id="altitude_value" class="altitude_value">0.00</div>
@@ -330,29 +342,29 @@ I (Joram Brenz) just put it together and made it work with the MultiDroneCoordin
 				<div id="battery_value" class="battery_value">0</div>
 			</div>
 			<div id="parameter_tab" class="parameter_tab">
-				<div id="parameter" class="parameter">
+				<div id="parameter_1" class="parameter">
 					<div id="speed_parameter_text" class="speed_parameter_text">Max Speed (m/s)</div>
 					<div id="speed_parameter_value" class="speed_parameter_value">0.00</div>
 					<input id="speed_parameter_change_button" class="speed_parameter_change_button" type="button" value="Change" onclick="speed_parameter_change_button();" />
 					<input id="speed_parameter_change_button_confirm" class="speed_parameter_change_button_confirm" type="button" value="Confirm" onclick="speed_parameter_change_confirm();" />
 					<input id="speed_parameter_change_button_cancel" class="speed_parameter_change_button_cancel" type="button" value="Cancel" onclick="speed_parameter_change_cancel();" />
-					<input id="speed_parameter_change_input" class="speed_parameter_change_input" type="input" value="" />
+					<input id="speed_parameter_change_input" class="speed_parameter_change_input" type="input" value="5" />
 				</div>
-				<div id="parameter" class="parameter">
+				<div id="parameter_2" class="parameter">
 					<div id="battery_life_parameter_text" class="speed_parameter_text">Battery Life (seconds)</div>
-					<div id="battery_life_value" class="speed_parameter_value">0.00</div>
+					<div id="battery_life_parameter_value" class="speed_parameter_value">0</div>
 					<input id="battery_life_parameter_change_button" class="speed_parameter_change_button" type="button" value="Change" onclick="battery_life_parameter_change_button();" />
 					<input id="battery_life_parameter_change_button_confirm" class="speed_parameter_change_button_confirm" type="button" value="Confirm" onclick="battery_life_parameter_change_confirm();" />
 					<input id="battery_life_parameter_change_button_cancel" class="speed_parameter_change_button_cancel" type="button" value="Cancel" onclick="battery_life_parameter_change_cancel();" />
-					<input id="battery_life_parameter_change_input" class="speed_parameter_change_input" type="input" value="" />
+					<input id="battery_life_parameter_change_input" class="speed_parameter_change_input" type="input" value="600" />
 				</div>
-				<div id="parameter" class="parameter">
+				<div id="parameter_3" class="parameter">
 					<div id="carry_weight_parameter_text" class="speed_parameter_text">Max Carry Weight (kg)</div>
-					<div id="carry_weight_value" class="speed_parameter_value">0.00</div>
+					<div id="carry_weight_parameter_value" class="speed_parameter_value">0</div>
 					<input id="carry_weight_parameter_change_button" class="speed_parameter_change_button" type="button" value="Change" onclick="carry_weight_parameter_change_button();" />
 					<input id="carry_weight_parameter_change_button_confirm" class="speed_parameter_change_button_confirm" type="button" value="Confirm" onclick="carry_weight_parameter_change_confirm();" />
 					<input id="carry_weight_parameter_change_button_cancel" class="speed_parameter_change_button_cancel" type="button" value="Cancel" onclick="carry_weight_parameter_change_cancel();" />
-					<input id="carry_weight_parameter_change_input" class="speed_parameter_change_input" type="input" value="" />
+					<input id="carry_weight_parameter_change_input" class="speed_parameter_change_input" type="input" value="10" />
 				</div>
 			</div>
 		</div>
@@ -597,6 +609,9 @@ I (Joram Brenz) just put it together and made it work with the MultiDroneCoordin
 					document.getElementById("heading_value").innerHTML = vehicle_heading;
 
 					var time_left = data[5];
+					if(time_left < 0) {
+						kill_vehicle(data[0])
+					}
 					var minutes = parseFloat(Math.round(Math.floor(time_left / 60) * 100) / 100).toFixed(0);
 					var seconds = parseFloat(Math.round((time_left - minutes * 60)* 100) / 100).toFixed(0);
 					document.getElementById("battery_value").innerHTML = minutes + "." + seconds;
@@ -613,10 +628,10 @@ I (Joram Brenz) just put it together and made it work with the MultiDroneCoordin
 					document.getElementById("speed_parameter_value").innerHTML = vehicle_max_speed;
 
 					vehicle_max_battery_time = parseFloat(Math.round(data[7] * 100) / 100).toFixed(0);
-					document.getElementById("battery_life_value").innerHTML = vehicle_max_battery_time;
+					document.getElementById("battery_life_parameter_value").innerHTML = vehicle_max_battery_time;
 
 					vehicle_max_carry_weight = parseFloat(Math.round(data[8] * 100) / 100).toFixed(0);
-					document.getElementById("carry_weight_value").innerHTML = vehicle_max_carry_weight;
+					document.getElementById("carry_weight_parameter_value").innerHTML = vehicle_max_carry_weight;
 				}
 			}
 
@@ -751,7 +766,7 @@ I (Joram Brenz) just put it together and made it work with the MultiDroneCoordin
 			}
 
 
-			function speed_parameter_change_confirm() {
+			function carry_weight_parameter_change_confirm() {
 				document.getElementById('carry_weight_parameter_value').style.display = "block";
 				document.getElementById('carry_weight_parameter_change_button').style.display = "block";
 				document.getElementById('carry_weight_parameter_change_input').style.display = "none";
@@ -766,6 +781,16 @@ I (Joram Brenz) just put it together and made it work with the MultiDroneCoordin
 					document.getElementById('carry_weight_parameter_change_input').value
 					]));
 			}
+
+
+			function reacharge_battery() {
+				ws.send(JSON.stringify([2, this.current_vehicle]));
+			}
+
+			
+			function kill_vehicle(id) {
+			}
+
 
 			init();
 			
