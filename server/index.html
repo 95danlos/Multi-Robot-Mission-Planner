@@ -41,22 +41,312 @@ I (Joram Brenz) just put it together and made it work with the MultiDroneCoordin
 				z-index:0;
 			}
 			
-			#buttonBox{
+			.buttonBox_fly{
 				position:absolute;
 				top:20px;
 				right:20px;
 				z-index:1000;
+				height: 50px;
+				width: 80px;
+			}
+			.button_fly{
+				height: 100%;
+				width: 100%;
+				font-size: 20px;
+				opacity: 0.7;
+			}
+			.buttonBox_search{
+				position:absolute;
+				top:80px;
+				right:20px;
+				z-index:1000;
+				height: 50px;
+				width: 80px;
+			}
+			.button_search{
+				height: 100%;
+				width: 100%;
+				font-size: 20px;
+				opacity: 0.7;
+			}
+			.flight_data{
+				position:absolute;
+				bottom:5px;
+				left:5px;
+				z-index:1000;
+				height: 400px;
+				width: 350px;
+				border: 2px solid black;
+			}
+			.next_vehicle_button{
+				position:absolute;
+				top:0px;
+				left:230px;
+				height: 50px;
+				width: 120px;
+				z-index:1000;
+				font-size: 15px;
+				opacity: 0.7;
+			}
+			.prev_vehicle_button{
+				position:absolute;
+				top:0px;
+				left:0px;
+				height: 50px;
+				width: 120px;
+				z-index:1000;
+				font-size: 15px;
+				opacity: 0.7;
+			}
+			.current_vehicle_text{
+				position:absolute;
+				text-align: center;
+				top:0px;
+				left:120px;
+				height: 50px;
+				width: 110px;
+				z-index:1000;
+				font-size: 40px;
+				color:white;
+				background-color: black;
+				opacity: 0.7;
+			}
+			.flight_data_button{
+				position:absolute;
+				top:50px;
+				left:0px;
+				height: 30px;
+				width: 175px;
+				z-index:1000;
+				font-size: 15px;
+				opacity: 0.7;
+			}
+			.parameter_button{
+				position:absolute;
+				top:50px;
+				left:175px;
+				height: 30px;
+				width: 175px;
+				z-index:1000;
+				font-size: 15px;
+				opacity: 0.7;
+			}
+			.flight_data_tab{
+				position:absolute;
+				top:80px;
+				left:0px;
+				height: 320px;
+				width: 350px;
+				z-index:1000;
+				font-size: 15px;
+				opacity: 0.7;
+			}
+			.altitude_text{
+				position:absolute;
+				top:20px;
+				left:40px;
+				z-index:1000;
+				font-size: 25px;
+				color: blue;
+			}
+			.speed_text{
+				position:absolute;
+				top:20px;
+				left:210px;
+				z-index:1000;
+				font-size: 25px;
+				color: orange;
+			}
+			.heading_text{
+				position:absolute;
+				top:120px;
+				left:40px;
+				z-index:1000;
+				font-size: 25px;
+				color: green;
+			}
+			.battery_text{
+				position:absolute;
+				top:120px;
+				left:210px;
+				z-index:1000;
+				font-size: 25px;
+				color: purple;
+			}
+			.altitude_value{
+				position:absolute;
+				top:50px;
+				left:40px;
+				z-index:1000;
+				font-size: 40px;
+				color: blue;
+			}
+			.speed_value{
+				position:absolute;
+				top:50px;
+				left:210px;
+				z-index:1000;
+				font-size: 40px;
+				color: orange;
+			}
+			.heading_value{
+				position:absolute;
+				top:150px;
+				left:40px;
+				z-index:1000;
+				font-size: 40px;
+				color: green;
+			}
+			.battery_value{
+				position:absolute;
+				top:150px;
+				left:210px;
+				z-index:1000;
+				font-size: 40px;
+				color: purple;
+			}
+			.parameter_tab{
+				position:absolute;
+				top:80px;
+				left:0px;
+				height: 320px;
+				width: 350px;
+				z-index:1000;
+				font-size: 15px;
+				opacity: 0.7;
+				display: none
+			}
+			.parameter{
+				position: relative;
+				height: 80px;
+				width: 350px;
+				z-index:1000;
+				font-size: 15px;
+				border-bottom: 1px solid black;
+			}
+			.speed_parameter_text{
+				position:absolute;
+				top:12px;
+				left:10px;
+				z-index:1000;
+				font-size: 20px;
+				font-weight: bold;
+			}
+			.speed_parameter_value{
+				position:absolute;
+				top:45px;
+				left:10px;
+				z-index:1000;
+				font-size: 20px;
+			}
+			.speed_parameter_change_button{
+				position:absolute;
+				top:20px;
+				left:250px;
+				height: 35px;
+				width: 80px;
+				z-index:1000;
+				font-size: 15px;
+			}
+			.speed_parameter_change_button_confirm{
+				position:absolute;
+				top:20px;
+				left:250px;
+				height: 35px;
+				width: 80px;
+				z-index:1000;
+				font-size: 15px;
+				opacity: 0.7;
+				display: none
+			}
+			.speed_parameter_change_button_cancel{
+				position:absolute;
+				top:20px;
+				left:150px;
+				height: 35px;
+				width: 80px;
+				z-index:1000;
+				font-size: 15px;
+				opacity: 0.7;
+				display: none
+			}
+			.speed_parameter_change_input{
+				position:absolute;
+				top:40px;
+				left:10px;
+				height: 20px;
+				width: 100px;
+				z-index:1000;
+				font-size: 15px;
+				opacity: 0.7;
+				display: none
 			}
 		</style>
 
 	</head>
 
 	<body height = 100% width = 100%>
+		<!--
+			Fly and search buttons
+		-->
+		<div class="buttonBox_fly">
+			<input id="submitButton" class="button_fly" type="button" value="Fly" onclick="fly();" />
+		</div>
 		<div id="buttonBox">
 			<input id="submitButton" type="button" value="Fly!" onclick="fly();" />
 			<input id="lineTask" type="button" value="Line task" onclick="setTask('line')">
-			<input id="polyTask" type="button" value="Poly task" onclick="setTask('poly')"">
+			<input id="polyTask" type="button" value="Poly task" onclick="setTask('poly')">
 		</div>
+
+		<!--
+			Flight Data
+		-->
+		<div class="flight_data">
+			<input id="next_vehicle_button" class="next_vehicle_button" type="button" value="Next Vehicle" onclick="next_vehicle();" />
+			<input id="prev_vehicle_button" class="prev_vehicle_button" type="button" value="Previous Vehicle" onclick="prev_vehicle();" />
+			<div id="current_vehicle_text" class="current_vehicle_text">1</div>
+			<input id="flight_data_button" class="flight_data_button" type="button" value="Flight Data" onclick="show_flight_data_tab();" />
+			<input id="parameter_button" class="parameter_button" type="button" value="Parameters" onclick="show_parameter_tab();" />
+
+			<div id="flight_data_tab" class="flight_data_tab">
+				<div id="altitude_text" class="altitude_text">Altitude (m)</div>
+				<div id="altitude_value" class="altitude_value">0.00</div>
+				<div id="speed_text" class="speed_text">Speed (m/s)</div>
+				<div id="speed_value" class="speed_value">0.00</div>
+				<div id="heading_text" class="heading_text">Heading (deg)</div>
+				<div id="heading_value" class="heading_value">0</div>
+				<div id="battery_text" class="battery_text">Battery (min)</div>
+				<div id="battery_value" class="battery_value">0</div>
+			</div>
+			<div id="parameter_tab" class="parameter_tab">
+				<div id="parameter" class="parameter">
+					<div id="speed_parameter_text" class="speed_parameter_text">Max Speed (m/s)</div>
+					<div id="speed_parameter_value" class="speed_parameter_value">0.00</div>
+					<input id="speed_parameter_change_button" class="speed_parameter_change_button" type="button" value="Change" onclick="speed_parameter_change_button();" />
+					<input id="speed_parameter_change_button_confirm" class="speed_parameter_change_button_confirm" type="button" value="Confirm" onclick="speed_parameter_change_confirm();" />
+					<input id="speed_parameter_change_button_cancel" class="speed_parameter_change_button_cancel" type="button" value="Cancel" onclick="speed_parameter_change_cancel();" />
+					<input id="speed_parameter_change_input" class="speed_parameter_change_input" type="input" value="" />
+				</div>
+				<div id="parameter" class="parameter">
+					<div id="battery_life_parameter_text" class="speed_parameter_text">Battery Life (seconds)</div>
+					<div id="battery_life_value" class="speed_parameter_value">0.00</div>
+					<input id="battery_life_parameter_change_button" class="speed_parameter_change_button" type="button" value="Change" onclick="battery_life_parameter_change_button();" />
+					<input id="battery_life_parameter_change_button_confirm" class="speed_parameter_change_button_confirm" type="button" value="Confirm" onclick="battery_life_parameter_change_confirm();" />
+					<input id="battery_life_parameter_change_button_cancel" class="speed_parameter_change_button_cancel" type="button" value="Cancel" onclick="battery_life_parameter_change_cancel();" />
+					<input id="battery_life_parameter_change_input" class="speed_parameter_change_input" type="input" value="" />
+				</div>
+				<div id="parameter" class="parameter">
+					<div id="carry_weight_parameter_text" class="speed_parameter_text">Max Carry Weight (kg)</div>
+					<div id="carry_weight_value" class="speed_parameter_value">0.00</div>
+					<input id="carry_weight_parameter_change_button" class="speed_parameter_change_button" type="button" value="Change" onclick="carry_weight_parameter_change_button();" />
+					<input id="carry_weight_parameter_change_button_confirm" class="speed_parameter_change_button_confirm" type="button" value="Confirm" onclick="carry_weight_parameter_change_confirm();" />
+					<input id="carry_weight_parameter_change_button_cancel" class="speed_parameter_change_button_cancel" type="button" value="Cancel" onclick="carry_weight_parameter_change_cancel();" />
+					<input id="carry_weight_parameter_change_input" class="speed_parameter_change_input" type="input" value="" />
+				</div>
+			</div>
+		</div>
+
+
 		<div id="mapid"></div>
 
 		<noscript>
@@ -75,7 +365,7 @@ I (Joram Brenz) just put it together and made it work with the MultiDroneCoordin
 			// this access token is the one used in the examples of the tutorial
 			// in theory one should get an own one, but it works for now and that's all I want for testing
 			L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token=pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpejY4NXVycTA2emYycXBndHRqcmZ3N3gifQ.rJcFIG214AriISLbB6B5aw', {
-				maxZoom: 30,
+				maxZoom: 20,
 				attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors, ' +
 					'<a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, ' +
 					'Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
@@ -86,9 +376,7 @@ I (Joram Brenz) just put it together and made it work with the MultiDroneCoordin
 			var startpos = null;
 			var lines = [];
 			var prevPos = null; 
-
-
-
+			
 			function doPolyTask(npos) {
 				var newpos = npos
 				//First time
@@ -146,6 +434,8 @@ I (Joram Brenz) just put it together and made it work with the MultiDroneCoordin
 			var drone_markers_and_traces = new Map();
 
 			var ws;
+			var number_of_vehicles = 0
+			var current_vehicle = 0
 						
 			function init() {
 
@@ -158,24 +448,14 @@ I (Joram Brenz) just put it together and made it work with the MultiDroneCoordin
 				};
 				
 				ws.onmessage = function(e) {
-					// e.data contains received string.
-					console.log("onmessage: " + e.data);
+					var data = JSON.parse(e.data);
 					
-					// create and set new drone position here
-					var id_and_position = JSON.parse(e.data);
-					var id = id_and_position[0];
-					var position = id_and_position[1];
-					if (!drone_markers_and_traces.has(id)) {
-						var new_drone_marker = L.circleMarker(position,{color:'red'}).bindTooltip("Im drone "+id).addTo(mymap);
-						var new_drone_trace = L.polyline([position],{color:'green'}).addTo(mymap);
-						drone_markers_and_traces.set(id, [new_drone_marker, new_drone_trace]);
-					} else {
-						var drone_marker_and_trace = drone_markers_and_traces.get(id);
-						drone_marker_and_trace[0].setLatLng(position);
-						drone_marker_and_trace[1].addLatLng(position);
-					}
-					console.log(id, position)
-				};
+					update_drone_position(data)
+					update_flight_data(data)
+					update_parameters(data)
+					highlight_vehicle(this.current_vehicle)
+
+				}.bind(this);
 				
 				ws.onclose = function() {
 					console.log("onclose");
@@ -190,26 +470,14 @@ I (Joram Brenz) just put it together and made it work with the MultiDroneCoordin
 
 			}
 
-			/*
-			window.addEventListener("unload", closeConnection, false);
-
-			function closeConnection() {
-				ws.close();
-			}
-			*/ // didn't really work
-
-			init();
-
 			function fly() {
-				console.log("fly");
 				var positions = [];
 				while (lines.length) {
 					var line = lines.pop();
 					line.remove();
 					positions.push(line.getLatLngs());
 				}
-				ws.send(JSON.stringify(positions));
-				console.log("Done");
+				ws.send(JSON.stringify([0, positions]));
 			}
 
 			function setTask(task) {
@@ -225,6 +493,215 @@ I (Joram Brenz) just put it together and made it work with the MultiDroneCoordin
 						polyTask=true
 				} 
 			}
+
+
+			function update_drone_position(data) {
+					var id = data[0];
+					var position = data[1];
+
+					// If new drone, add marker
+					if (!drone_markers_and_traces.has(id)) {
+						var new_drone_marker = L.circleMarker(position,{color:'red',radius:"10"}).bindTooltip("Vehicle "+(id+1)).addTo(mymap);
+						var new_drone_trace = L.polyline([position],{color:'green'}).addTo(mymap);
+						drone_markers_and_traces.set(id, [new_drone_marker, new_drone_trace]);
+						this.number_of_vehicles ++;
+
+					// else update marker
+					} else {
+						var drone_marker_and_trace = drone_markers_and_traces.get(id);
+						drone_marker_and_trace[0].setLatLng(position);
+						drone_marker_and_trace[1].addLatLng(position);
+					}
+			}
+
+
+			function update_flight_data(data) {
+				var id = data[0];
+
+				// Only show flight data for the currently selected vehicle
+				if(this.current_vehicle === id) {
+					vehicle_attitude = parseFloat(Math.round(data[2] * 100) / 100).toFixed(1);
+					document.getElementById("altitude_value").innerHTML = vehicle_attitude;
+
+					vehicle_speed = parseFloat(Math.round(data[3] * 100) / 100).toFixed(1);
+					document.getElementById("speed_value").innerHTML = vehicle_speed;
+
+					vehicle_heading = parseFloat(Math.round(data[4] * 100) / 100).toFixed(0);
+					document.getElementById("heading_value").innerHTML = vehicle_heading;
+
+					var time_left = data[5];
+					var minutes = parseFloat(Math.round(Math.floor(time_left / 60) * 100) / 100).toFixed(0);
+					var seconds = parseFloat(Math.round((time_left - minutes * 60)* 100) / 100).toFixed(0);
+					document.getElementById("battery_value").innerHTML = minutes + "." + seconds;
+				}
+			}
+
+
+			function update_parameters(data) {
+				var id = data[0];
+
+				// Only show parameters for the currently selected vehicle
+				if(this.current_vehicle === id) {
+					vehicle_max_speed = parseFloat(Math.round(data[6] * 100) / 100).toFixed(2);
+					document.getElementById("speed_parameter_value").innerHTML = vehicle_max_speed;
+
+					vehicle_max_battery_time = parseFloat(Math.round(data[7] * 100) / 100).toFixed(0);
+					document.getElementById("battery_life_value").innerHTML = vehicle_max_battery_time;
+
+					vehicle_max_carry_weight = parseFloat(Math.round(data[8] * 100) / 100).toFixed(0);
+					document.getElementById("carry_weight_value").innerHTML = vehicle_max_carry_weight;
+				}
+			}
+
+
+			function next_vehicle() {
+				if(this.current_vehicle < this.number_of_vehicles - 1) {
+					this.current_vehicle += 1
+					document.getElementById("current_vehicle_text").innerHTML = this.current_vehicle + 1 ;
+					highlight_vehicle(this.current_vehicle)				
+					remove_highlight_from_vehicle(this.current_vehicle - 1)
+				}
+			}
+
+			function prev_vehicle() {
+				if(this.current_vehicle !== 0) {
+					this.current_vehicle -= 1
+					document.getElementById("current_vehicle_text").innerHTML = this.current_vehicle + 1 ;
+					highlight_vehicle(this.current_vehicle)				
+					remove_highlight_from_vehicle(this.current_vehicle + 1)
+				}
+			}
+
+
+			function highlight_vehicle(id) {
+				var drone_marker_and_trace = drone_markers_and_traces.get(id);
+				drone_marker_and_trace[0].setRadius(15);
+				drone_marker_and_trace[0].setStyle({color:'green'});
+			}
+			
+
+			function remove_highlight_from_vehicle(id) {
+				var drone_marker_and_trace = drone_markers_and_traces.get(id);;
+				drone_marker_and_trace[0].setRadius(10);
+				drone_marker_and_trace[0].setStyle({color:'red'});
+			}
+
+
+			function show_flight_data_tab() {
+				document.getElementById('flight_data_tab').style.display = "block";
+				document.getElementById('parameter_tab').style.display = "none";
+			}
+
+
+			function show_parameter_tab() {
+				document.getElementById('flight_data_tab').style.display = "none";
+				document.getElementById('parameter_tab').style.display = "block";
+			}
+
+			
+			function speed_parameter_change_button() {
+				document.getElementById('speed_parameter_value').style.display = "none";
+				document.getElementById('speed_parameter_change_button').style.display = "none";
+				document.getElementById('speed_parameter_change_input').style.display = "block";
+				document.getElementById('speed_parameter_change_button_cancel').style.display = "block";
+				document.getElementById('speed_parameter_change_button_confirm').style.display = "block";
+			}
+
+			function speed_parameter_change_cancel() {
+				document.getElementById('speed_parameter_value').style.display = "block";
+				document.getElementById('speed_parameter_change_button').style.display = "block";
+				document.getElementById('speed_parameter_change_input').style.display = "none";
+				document.getElementById('speed_parameter_change_button_cancel').style.display = "none";
+				document.getElementById('speed_parameter_change_button_confirm').style.display = "none";
+			}
+
+
+			function speed_parameter_change_confirm() {
+				document.getElementById('speed_parameter_value').style.display = "block";
+				document.getElementById('speed_parameter_change_button').style.display = "block";
+				document.getElementById('speed_parameter_change_input').style.display = "none";
+				document.getElementById('speed_parameter_change_button_cancel').style.display = "none";
+				document.getElementById('speed_parameter_change_button_confirm').style.display = "none";
+
+				ws.send(JSON.stringify([
+					1, 
+					this.current_vehicle, 
+					document.getElementById('speed_parameter_change_input').value,
+					document.getElementById('battery_life_parameter_change_input').value,
+					document.getElementById('carry_weight_parameter_change_input').value
+					]));
+			}
+
+
+			function battery_life_parameter_change_button() {
+				document.getElementById('battery_life_parameter_value').style.display = "none";
+				document.getElementById('battery_life_parameter_change_button').style.display = "none";
+				document.getElementById('battery_life_parameter_change_input').style.display = "block";
+				document.getElementById('battery_life_parameter_change_button_cancel').style.display = "block";
+				document.getElementById('battery_life_parameter_change_button_confirm').style.display = "block";
+			}
+
+			function battery_life_parameter_change_cancel() {
+				document.getElementById('battery_life_parameter_value').style.display = "block";
+				document.getElementById('battery_life_parameter_change_button').style.display = "block";
+				document.getElementById('battery_life_parameter_change_input').style.display = "none";
+				document.getElementById('battery_life_parameter_change_button_cancel').style.display = "none";
+				document.getElementById('battery_life_parameter_change_button_confirm').style.display = "none";
+			}
+
+
+			function battery_life_parameter_change_confirm() {
+				document.getElementById('battery_life_parameter_value').style.display = "block";
+				document.getElementById('battery_life_parameter_change_button').style.display = "block";
+				document.getElementById('battery_life_parameter_change_input').style.display = "none";
+				document.getElementById('battery_life_parameter_change_button_cancel').style.display = "none";
+				document.getElementById('battery_life_parameter_change_button_confirm').style.display = "none";
+
+				ws.send(JSON.stringify([
+					1, 
+					this.current_vehicle, 
+					document.getElementById('speed_parameter_change_input').value,
+					document.getElementById('battery_life_parameter_change_input').value,
+					document.getElementById('carry_weight_parameter_change_input').value
+					]));
+			}
+
+
+			function carry_weight_parameter_change_button() {
+				document.getElementById('carry_weight_parameter_value').style.display = "none";
+				document.getElementById('carry_weight_parameter_change_button').style.display = "none";
+				document.getElementById('carry_weight_parameter_change_input').style.display = "block";
+				document.getElementById('carry_weight_parameter_change_button_cancel').style.display = "block";
+				document.getElementById('carry_weight_parameter_change_button_confirm').style.display = "block";
+			}
+
+			function carry_weight_parameter_change_cancel() {
+				document.getElementById('carry_weight_parameter_value').style.display = "block";
+				document.getElementById('carry_weight_parameter_change_button').style.display = "block";
+				document.getElementById('carry_weight_parameter_change_input').style.display = "none";
+				document.getElementById('carry_weight_parameter_change_button_cancel').style.display = "none";
+				document.getElementById('carry_weight_parameter_change_button_confirm').style.display = "none";
+			}
+
+
+			function speed_parameter_change_confirm() {
+				document.getElementById('carry_weight_parameter_value').style.display = "block";
+				document.getElementById('carry_weight_parameter_change_button').style.display = "block";
+				document.getElementById('carry_weight_parameter_change_input').style.display = "none";
+				document.getElementById('carry_weight_parameter_change_button_cancel').style.display = "none";
+				document.getElementById('carry_weight_parameter_change_button_confirm').style.display = "none";
+
+				ws.send(JSON.stringify([
+					1, 
+					this.current_vehicle, 
+					document.getElementById('speed_parameter_change_input').value,
+					document.getElementById('battery_life_parameter_change_input').value,
+					document.getElementById('carry_weight_parameter_change_input').value
+					]));
+			}
+
+			init();
+			
 
 		</script>
 				

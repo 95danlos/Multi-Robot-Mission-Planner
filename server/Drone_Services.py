@@ -33,7 +33,7 @@ def initialize(vehicles, UAV_BASE_PORT):
 				print(e)
 				time.sleep(1)
 			else:
-				vehicle.instance_index = instance_index
+				vehicle.id = instance_index
 				vehicle.nextlocations = []
 				vehicles.append(vehicle)
 				break
@@ -46,52 +46,72 @@ def arm_and_takeoff(vehicle, aTargetAltitude):
 	Arms vehicle and fly to aTargetAltitude.
 	"""
 
-	print("Vehicle %i: Basic pre-arm checks" % vehicle.instance_index)
+	print("Vehicle %i: Basic pre-arm checks" % vehicle.id)
 	# Don't try to arm until autopilot is ready
-	print("Vehicle %i: Waiting for vehicle to initialise..."  % vehicle.instance_index)
+	print("Vehicle %i: Waiting for vehicle to initialise..."  % vehicle.id)
 	while not vehicle.is_armable:
 		time.sleep(1)
 
-	print("Vehicle %i: Arming motors" % vehicle.instance_index)
+	print("Vehicle %i: Arming motors" % vehicle.id)
 	# Copter should arm in GUIDED mode
 	vehicle.mode = dronekit.VehicleMode("GUIDED")
 	vehicle.armed = True    
 
 	# Confirm vehicle armed before attempting to take off
-	print("Vehicle %i: Waiting for arming..." % vehicle.instance_index)
+	print("Vehicle %i: Waiting for arming..." % vehicle.id)
 	while not vehicle.armed:      
 		time.sleep(1)
 
-	print("Vehicle %i: Taking off!" % vehicle.instance_index)
+	print("Vehicle %i: Taking off!" % vehicle.id)
 	vehicle.simple_takeoff(aTargetAltitude) # Take off to target altitude
 
 	# Wait until the vehicle reaches a safe height before processing the goto (otherwise the command 
 	#  after Vehicle.simple_takeoff will execute immediately).
 	while True:
-		print("Vehicle %i: Altitude: " % vehicle.instance_index, vehicle.location.global_relative_frame.alt)
+		print("Vehicle %i: Altitude: " % vehicle.id, vehicle.location.global_relative_frame.alt)
 		#Break and return from function just below target altitude.        
 		if vehicle.location.global_relative_frame.alt>=aTargetAltitude*0.95: 
-			print("Vehicle %i: Reached target altitude" % vehicle.instance_index)
+			print("Vehicle %i: Reached target altitude" % vehicle.id)
 			break
 		time.sleep(1)
 
-	#print("Vehicle %i: Set default/target airspeed to 5" % vehicle.instance_index)
-	#vehicle.airspeed = 5
-
-
-def start_position_tracking(vehicles, server):
+"""
+Start to send vehicle information to client
+"""
+def start_data_updating(vehicles, server):
 	for vehicle in vehicles:
-		t = threading.Thread(target=lambda:position_tracker_thread(vehicle, server))
+		t = threading.Thread(target=lambda:start_data_updating_thread(vehicle, server))
 		t.daemon = True
 		t.start()
 
 
-def position_tracker_thread(vehicle, server):
+def start_data_updating_thread(vehicle, server):
 	while True:
-		position = [vehicle.location.global_frame.lat, vehicle.location.global_frame.lon]
-		vehicle_id = vehicle.instance_index
-		#print (vehicle, position)
-		server.send_message_to_all(repr([vehicle_id,position]))
+		vehicle_id = vehicle.id
+		vehicle_position = [vehicle.location.global_frame.lat, vehicle.location.global_frame.lon]
+		
+		# Flight data
+		vehicle_altitude = vehicle.location.global_relative_frame.alt
+		vehicle_speed = vehicle.groundspeed
+		vehicle_heading = vehicle.heading
+		vehicle_battery = 600
+
+		# Parameters
+		vehicle_max_speed = 5
+		vehicle_max_battery_time = 600
+		vehicle_max_carry_weight = 10
+
+		server.send_message_to_all(repr([
+			vehicle_id,
+			vehicle_position,
+			vehicle_altitude,
+			vehicle_speed,
+			vehicle_heading,
+			vehicle_battery,
+			vehicle_max_speed,
+			vehicle_max_battery_time,
+			vehicle_max_carry_weight
+			]))
 		time.sleep(0.1)
 
 
@@ -101,6 +121,12 @@ def do_for_all(vehicles, function):
 		t.start()
 	for t in threads:
 		t.join()
+
+
+def find_vehicle_by_id(vehicles, id):
+	for vehicle in vehicles:
+		if vehicle.id == id:
+			return vehicle
 
 
 def distance(location1, location2):

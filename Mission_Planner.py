@@ -16,7 +16,7 @@ undistributed_lines = []
 
 def main():
 	Drone_Services.initialize(vehicles, UAV_BASE_PORT)
-	Drone_Services.start_position_tracking(vehicles, server)
+	Drone_Services.start_data_updating(vehicles, server)
 	server.set_fn_message_received(message_received)
 
 	try:
@@ -91,11 +91,27 @@ def distribute_tasks(free_vehicles, undistributed_lines):
 
 # Called when a client clicks on fly button
 def message_received(client, server, message):
+
+	# First position indicates message type
+	message_type = ast.literal_eval(message)[0]
+
+	if(message_type == 0):
+
+		""" adding new lines that user draw on map """
+		lines = ast.literal_eval(message)[1]
+		lines = [[dronekit.LocationGlobal(point["lat"],point["lng"],20) for point in line] for line in lines]
+		undistributed_lines.extend(lines)
+
+	if(message_type == 1):
+
+		""" Change Parameters """
+		vehicle_id = ast.literal_eval(message)[1]
+		vehicle = Drone_Services.find_vehicle_by_id(vehicles, vehicle_id)
+
+		new_max_speed = ast.literal_eval(message)[2]
+		vehicle.max_speed = float(new_max_speed)
+		vehicle.groundspeed = float(new_max_speed)
 	
-	""" adding new lines that user draw on map """
-	lines = ast.literal_eval(message)
-	lines = [[dronekit.LocationGlobal(point["lat"],point["lng"],20) for point in line] for line in lines]
-	undistributed_lines.extend(lines)
 
 
 
