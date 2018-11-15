@@ -525,7 +525,7 @@ I (Joram Brenz) just put it together and made it work with the MultiDroneCoordin
 					linetasks.push(line.getLatLngs());
 				}
 
-				tasks.push(linetasks) 
+				tasks[0] = linetasks; 
 
 				var polygontasks = []; 
 				var j = 0; 
@@ -546,7 +546,7 @@ I (Joram Brenz) just put it together and made it work with the MultiDroneCoordin
 				}
 
 				console.log(polygons.length)
-				tasks.push(polygons)
+				tasks[1] = polygons;
 
 
 				ws.send(JSON.stringify([0, tasks]));
