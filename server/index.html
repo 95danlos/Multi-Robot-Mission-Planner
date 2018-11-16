@@ -301,8 +301,9 @@ I (Joram Brenz) just put it together and made it work with the MultiDroneCoordin
 				font-size: 18px; 
 				opacity: 0.7; 
 			}
-			.poly {
+			.search {
 				display: none; 
+				font-size: 1.0em; 
 			}
 		</style>
 
@@ -315,8 +316,8 @@ I (Joram Brenz) just put it together and made it work with the MultiDroneCoordin
 		<div class="buttonBox_fly">
 			<input id="submitButton" class="button_fly" type="button" value="Fly" onclick="fly();" />
 			<input id="lineTask" class="button_task" type="button" value="Line task" onclick="setTask('line'); " />
-			<input id="polyTask" class="button_task" type="button" value="Poly task" onclick="setTask('poly'); " />
-			<input id="savePoly" class="button_task poly" type="button" value="Save Polytask" onclick="savePoly(); "/>
+			<input id="searchTask" class="button_task" type="button" value="Search Task" onclick="setTask('search'); " />
+			<input id="saveSearchTask" class="button_task search" type="button" value="Save Search Task" onclick="saveSearchTask(); "/>
 			<input id="pickupTask" class="button_task" type="button" value="Pick-up task" onclick="setTask('pickup');" />
 		</div>
 
@@ -375,6 +376,8 @@ I (Joram Brenz) just put it together and made it work with the MultiDroneCoordin
 		<noscript>
 			Please activate JavaScript in your Browser for this Frontend to work.
 		</noscript>
+
+
 		<script>
 
 			//What task the user wants to create. Default is linetask
@@ -397,13 +400,16 @@ I (Joram Brenz) just put it together and made it work with the MultiDroneCoordin
 			var startposmarker = L.marker([0,0]);
 			var startpos = null;
 			var lines = [];
-			var polylines = []; 
-			var polygons = []; 
+
+			var search_task = []; 
+			var search_markers = []; 
+
 			var prevPos = null; 
+			var latlngs = []; 
 
 			//This is the array that will be sent to the server. It will contain all the different tasks, each index corresponding to a specific task
 			//0 = linetask, 1 = polygontask, 2 = pickup task (not implemented)
-			var tasks = []; 
+			var tasks = {}; 
 			
 			function doPolyTask(npos) {
 				var newpos = npos
@@ -431,12 +437,12 @@ I (Joram Brenz) just put it together and made it work with the MultiDroneCoordin
 				function doLineTask(npos) {
 				var newpos = npos
 				if (startpos == null) {
-					startpos = newpos;
-					startposmarker.setLatLng(startpos);
+					startposmarker.setLatLng(npos);
 					startposmarker.addTo(mymap);
+					startpos = npos;
 				}
 				else {
-					var line = L.polyline([startpos, newpos]);
+					var line = L.polyline([startpos, npos]);
 					line.addTo(mymap);
 					lines.push(line);
 					startpos = null;
@@ -444,25 +450,88 @@ I (Joram Brenz) just put it together and made it work with the MultiDroneCoordin
 				}
 			}
 
-			function savePoly() {
+			function doSearchTask(npos) {
 
+				var marker = L.marker(npos)
+				search_markers.push(marker)
+				marker.addTo(mymap)
 
-				polygons.push(polylines)
+				if (startpos == null) {
+					startpos = npos
+				}
 
-				polylines = []
-
-				console.log(polygons[0])
-
-				document.getElementById("polyTask").style.display="block"; 
-				document.getElementById("savePoly").style.display="none"; 
+				latlngs.push(npos); 
 			}
+
+
+			function saveSearchTask() {
+				task = "none"; 
+
+				if(latlngs.length > 3) {
+					latlngs.push(startpos)
+					L.polyline(latlngs, {color: 'red'}).addTo(mymap)
+					startpos = null
+					createSearchRectangle();
+				} 
+
+				//clear markers
+				for(let i = 0; i < search_markers.length; i++) {
+					startposmarker = search_markers[i]
+					///startposmarker.remove(); 
+				}
+
+				search_markers = []; 
+				document.getElementById("searchTask").style.display="block"; 
+				document.getElementById("saveSearchTask").style.display="none"; 
+			}
+
+
+			function createSearchRectangle() {
+
+				var lowlat = 90, lowlng = 180
+				var highlat = -90, highlng = -180
+				for (let i = 0; i < latlngs.length; i++) {
+					if (latlngs[i]['lng'] <= lowlng)
+						lowlng = latlngs[i]['lng']
+					if(latlngs[i]['lng'] >= highlng) {
+						highlng = latlngs[i]['lng']
+					}
+					if(latlngs[i]['lat'] <= lowlat)
+						lowlat = latlngs[i]['lat']
+					if(latlngs[i]['lat'] >= highlat)
+						highlat = latlngs[i]['lat'];
+				}
+
+
+				console.log(highlng)
+				var rectangle = [
+					//North West
+					[highlat, lowlng],
+					//North East
+					[highlat, highlng],
+					//South East
+					[lowlat, highlng],
+					//South West
+					[lowlat, lowlng],
+					//North West (to close the area)
+					[highlat, lowlng]
+				]
+
+				L.polyline(rectangle, {color: 'purple'}).addTo(mymap)			
+
+
+				latlngs = []; 
+				search_task.push(rectangle)
+			}
+
+
 
 			function onMapClick(e) {
 				var newpos = e.latlng;
-
+				
 				console.log("Task:" + task)
-				if(task === "poly") {
-					doPolyTask(newpos) 
+				if(task === "search") { 
+					doSearchTask(newpos)
 				}
 
 				else if(task === "line") {
@@ -520,35 +589,18 @@ I (Joram Brenz) just put it together and made it work with the MultiDroneCoordin
 				var linetasks = [];
 				while (lines.length) {
 					var line = lines.pop();
-					console.log(line.getLatLngs()); 
 					line.remove();
 					linetasks.push(line.getLatLngs());
 				}
 
-				tasks[0] = linetasks; 
+				//Index 0 = Line Tasks
+				tasks['line'] = linetasks; 
 
-				var polygontasks = []; 
-				var j = 0; 
-				while (j < polygons.length) {
-					polygon = polygons[j]
-					console.log(polygons.length)
-
-					var i = 0; 
-
-					while( i < polygon.length) {
-						var line = polygon[i];
-						line.remove()
-						polygon[i] = line.getLatLngs(); 
-
-						i++;  
-					}
-					j++; 
-				}
-
-				console.log(polygons.length)
-				tasks[1] = polygons;
+				//Index 1 = Search Tasks
+				tasks['search'] = search_task;
 
 
+				console.log("JSON: " + tasks['line'])
 				ws.send(JSON.stringify([0, tasks]));
 			}
 
@@ -559,15 +611,13 @@ I (Joram Brenz) just put it together and made it work with the MultiDroneCoordin
 					case "line":
 						this.task = "line"
 						break
-					case "poly":
-						console.log("kake")
+					case "search":
 						prevPos = null
-						this.task="poly"
-
-						document.getElementById("polyTask").style.display="none"; 
-						document.getElementById("savePoly").style.display="block"; 
-
+						this.task="search"
+						document.getElementById("searchTask").style.display="none"; 
+						document.getElementById("saveSearchTask").style.display="block"; 
 						break
+
 					case "pickup":
 						this.task = "pickup"
 						break
