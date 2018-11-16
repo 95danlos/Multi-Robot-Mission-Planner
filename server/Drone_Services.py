@@ -34,6 +34,11 @@ def initialize(vehicles, UAV_BASE_PORT):
 				time.sleep(1)
 			else:
 				vehicle.id = instance_index
+				vehicle.max_speed = 5
+				vehicle.current_battery = 600
+				vehicle.max_battery_time = 600
+				vehicle.max_carry_weight = 10
+				vehicle.start_up_time = time.time()
 				vehicle.nextlocations = []
 				vehicles.append(vehicle)
 				break
@@ -94,12 +99,15 @@ def start_data_updating_thread(vehicle, server):
 		vehicle_altitude = vehicle.location.global_relative_frame.alt
 		vehicle_speed = vehicle.groundspeed
 		vehicle_heading = vehicle.heading
-		vehicle_battery = 600
+		vehicle_current_battery = vehicle.current_battery - (time.time() - vehicle.start_up_time)
+
+		#if(vehicle_current_battery <= 0):
+			#vehicle.close()
 
 		# Parameters
-		vehicle_max_speed = 5
-		vehicle_max_battery_time = 600
-		vehicle_max_carry_weight = 10
+		vehicle_max_speed = vehicle.max_speed
+		vehicle_max_battery_time = vehicle.max_battery_time
+		vehicle_max_carry_weight = vehicle.max_carry_weight
 
 		server.send_message_to_all(repr([
 			vehicle_id,
@@ -107,7 +115,7 @@ def start_data_updating_thread(vehicle, server):
 			vehicle_altitude,
 			vehicle_speed,
 			vehicle_heading,
-			vehicle_battery,
+			vehicle_current_battery,
 			vehicle_max_speed,
 			vehicle_max_battery_time,
 			vehicle_max_carry_weight

@@ -191,6 +191,16 @@ I (Joram Brenz) just put it together and made it work with the MultiDroneCoordin
 				font-size: 40px;
 				color: purple;
 			}
+			.reacharge_battery_button{
+				position:absolute;
+				bottom:20px;
+				left:20px;
+				height: 30px;
+				width: 150px;
+				z-index:1001;
+				font-size: 15px;
+				opacity: 0.7;
+			}
 			.parameter_tab{
 				position:absolute;
 				top:80px;
@@ -227,33 +237,34 @@ I (Joram Brenz) just put it together and made it work with the MultiDroneCoordin
 			}
 			.speed_parameter_change_button{
 				position:absolute;
-				top:20px;
+				top:35px;
 				left:250px;
 				height: 35px;
 				width: 80px;
 				z-index:1000;
 				font-size: 15px;
+				opacity: 0.8;
 			}
 			.speed_parameter_change_button_confirm{
 				position:absolute;
-				top:20px;
+				top:35px;
 				left:250px;
 				height: 35px;
 				width: 80px;
 				z-index:1000;
 				font-size: 15px;
-				opacity: 0.7;
+				opacity: 0.8;
 				display: none
 			}
 			.speed_parameter_change_button_cancel{
 				position:absolute;
-				top:20px;
+				top:35px;
 				left:150px;
 				height: 35px;
 				width: 80px;
 				z-index:1000;
 				font-size: 15px;
-				opacity: 0.7;
+				opacity: 0.8;
 				display: none
 			}
 			.speed_parameter_change_input{
@@ -290,8 +301,9 @@ I (Joram Brenz) just put it together and made it work with the MultiDroneCoordin
 				font-size: 18px; 
 				opacity: 0.7; 
 			}
-			.poly {
+			.search {
 				display: none; 
+				font-size: 1.0em; 
 			}
 		</style>
 
@@ -304,8 +316,8 @@ I (Joram Brenz) just put it together and made it work with the MultiDroneCoordin
 		<div class="buttonBox_fly">
 			<input id="submitButton" class="button_fly" type="button" value="Fly" onclick="fly();" />
 			<input id="lineTask" class="button_task" type="button" value="Line task" onclick="setTask('line'); " />
-			<input id="polyTask" class="button_task" type="button" value="Poly task" onclick="setTask('poly'); " />
-			<input id="savePoly" class="button_task poly" type="button" value="Save Polytask" onclick="savePoly(); "/>
+			<input id="searchTask" class="button_task" type="button" value="Search Task" onclick="setTask('search'); " />
+			<input id="saveSearchTask" class="button_task search" type="button" value="Save Search Task" onclick="saveSearchTask(); "/>
 			<input id="pickupTask" class="button_task" type="button" value="Pick-up task" onclick="setTask('pickup');" />
 		</div>
 
@@ -318,7 +330,8 @@ I (Joram Brenz) just put it together and made it work with the MultiDroneCoordin
 			<div id="current_vehicle_text" class="current_vehicle_text">1</div>
 			<input id="flight_data_button" class="flight_data_button" type="button" value="Flight Data" onclick="show_flight_data_tab();" />
 			<input id="parameter_button" class="parameter_button" type="button" value="Parameters" onclick="show_parameter_tab();" />
-
+			<input id="reacharge_battery_button" class="reacharge_battery_button" type="button" value="Reacharge Battery" onclick="reacharge_battery();" />
+			
 			<div id="flight_data_tab" class="flight_data_tab">
 				<div id="altitude_text" class="altitude_text">Altitude (m)</div>
 				<div id="altitude_value" class="altitude_value">0.00</div>
@@ -330,29 +343,29 @@ I (Joram Brenz) just put it together and made it work with the MultiDroneCoordin
 				<div id="battery_value" class="battery_value">0</div>
 			</div>
 			<div id="parameter_tab" class="parameter_tab">
-				<div id="parameter" class="parameter">
+				<div id="parameter_1" class="parameter">
 					<div id="speed_parameter_text" class="speed_parameter_text">Max Speed (m/s)</div>
 					<div id="speed_parameter_value" class="speed_parameter_value">0.00</div>
 					<input id="speed_parameter_change_button" class="speed_parameter_change_button" type="button" value="Change" onclick="speed_parameter_change_button();" />
 					<input id="speed_parameter_change_button_confirm" class="speed_parameter_change_button_confirm" type="button" value="Confirm" onclick="speed_parameter_change_confirm();" />
 					<input id="speed_parameter_change_button_cancel" class="speed_parameter_change_button_cancel" type="button" value="Cancel" onclick="speed_parameter_change_cancel();" />
-					<input id="speed_parameter_change_input" class="speed_parameter_change_input" type="input" value="" />
+					<input id="speed_parameter_change_input" class="speed_parameter_change_input" type="input" value="5" />
 				</div>
-				<div id="parameter" class="parameter">
+				<div id="parameter_2" class="parameter">
 					<div id="battery_life_parameter_text" class="speed_parameter_text">Battery Life (seconds)</div>
-					<div id="battery_life_value" class="speed_parameter_value">0.00</div>
+					<div id="battery_life_parameter_value" class="speed_parameter_value">0</div>
 					<input id="battery_life_parameter_change_button" class="speed_parameter_change_button" type="button" value="Change" onclick="battery_life_parameter_change_button();" />
 					<input id="battery_life_parameter_change_button_confirm" class="speed_parameter_change_button_confirm" type="button" value="Confirm" onclick="battery_life_parameter_change_confirm();" />
 					<input id="battery_life_parameter_change_button_cancel" class="speed_parameter_change_button_cancel" type="button" value="Cancel" onclick="battery_life_parameter_change_cancel();" />
-					<input id="battery_life_parameter_change_input" class="speed_parameter_change_input" type="input" value="" />
+					<input id="battery_life_parameter_change_input" class="speed_parameter_change_input" type="input" value="600" />
 				</div>
-				<div id="parameter" class="parameter">
+				<div id="parameter_3" class="parameter">
 					<div id="carry_weight_parameter_text" class="speed_parameter_text">Max Carry Weight (kg)</div>
-					<div id="carry_weight_value" class="speed_parameter_value">0.00</div>
+					<div id="carry_weight_parameter_value" class="speed_parameter_value">0</div>
 					<input id="carry_weight_parameter_change_button" class="speed_parameter_change_button" type="button" value="Change" onclick="carry_weight_parameter_change_button();" />
 					<input id="carry_weight_parameter_change_button_confirm" class="speed_parameter_change_button_confirm" type="button" value="Confirm" onclick="carry_weight_parameter_change_confirm();" />
 					<input id="carry_weight_parameter_change_button_cancel" class="speed_parameter_change_button_cancel" type="button" value="Cancel" onclick="carry_weight_parameter_change_cancel();" />
-					<input id="carry_weight_parameter_change_input" class="speed_parameter_change_input" type="input" value="" />
+					<input id="carry_weight_parameter_change_input" class="speed_parameter_change_input" type="input" value="10" />
 				</div>
 			</div>
 		</div>
@@ -363,6 +376,8 @@ I (Joram Brenz) just put it together and made it work with the MultiDroneCoordin
 		<noscript>
 			Please activate JavaScript in your Browser for this Frontend to work.
 		</noscript>
+
+
 		<script>
 
 			//What task the user wants to create. Default is linetask
@@ -385,13 +400,16 @@ I (Joram Brenz) just put it together and made it work with the MultiDroneCoordin
 			var startposmarker = L.marker([0,0]);
 			var startpos = null;
 			var lines = [];
-			var polylines = []; 
-			var polygons = []; 
+
+			var search_task = []; 
+			var search_markers = []; 
+
 			var prevPos = null; 
+			var latlngs = []; 
 
 			//This is the array that will be sent to the server. It will contain all the different tasks, each index corresponding to a specific task
 			//0 = linetask, 1 = polygontask, 2 = pickup task (not implemented)
-			var tasks = []; 
+			var tasks = {}; 
 			
 			function doPolyTask(npos) {
 				var newpos = npos
@@ -419,12 +437,12 @@ I (Joram Brenz) just put it together and made it work with the MultiDroneCoordin
 				function doLineTask(npos) {
 				var newpos = npos
 				if (startpos == null) {
-					startpos = newpos;
-					startposmarker.setLatLng(startpos);
+					startposmarker.setLatLng(npos);
 					startposmarker.addTo(mymap);
+					startpos = npos;
 				}
 				else {
-					var line = L.polyline([startpos, newpos]);
+					var line = L.polyline([startpos, npos]);
 					line.addTo(mymap);
 					lines.push(line);
 					startpos = null;
@@ -432,25 +450,88 @@ I (Joram Brenz) just put it together and made it work with the MultiDroneCoordin
 				}
 			}
 
-			function savePoly() {
+			function doSearchTask(npos) {
 
+				var marker = L.marker(npos)
+				search_markers.push(marker)
+				marker.addTo(mymap)
 
-				polygons.push(polylines)
+				if (startpos == null) {
+					startpos = npos
+				}
 
-				polylines = []
-
-				console.log(polygons[0])
-
-				document.getElementById("polyTask").style.display="block"; 
-				document.getElementById("savePoly").style.display="none"; 
+				latlngs.push(npos); 
 			}
+
+
+			function saveSearchTask() {
+				task = "none"; 
+
+				if(latlngs.length > 3) {
+					latlngs.push(startpos)
+					L.polyline(latlngs, {color: 'red'}).addTo(mymap)
+					startpos = null
+					createSearchRectangle();
+				} 
+
+				//clear markers
+				for(let i = 0; i < search_markers.length; i++) {
+					startposmarker = search_markers[i]
+					///startposmarker.remove(); 
+				}
+
+				search_markers = []; 
+				document.getElementById("searchTask").style.display="block"; 
+				document.getElementById("saveSearchTask").style.display="none"; 
+			}
+
+
+			function createSearchRectangle() {
+
+				var lowlat = 90, lowlng = 180
+				var highlat = -90, highlng = -180
+				for (let i = 0; i < latlngs.length; i++) {
+					if (latlngs[i]['lng'] <= lowlng)
+						lowlng = latlngs[i]['lng']
+					if(latlngs[i]['lng'] >= highlng) {
+						highlng = latlngs[i]['lng']
+					}
+					if(latlngs[i]['lat'] <= lowlat)
+						lowlat = latlngs[i]['lat']
+					if(latlngs[i]['lat'] >= highlat)
+						highlat = latlngs[i]['lat'];
+				}
+
+
+				console.log(highlng)
+				var rectangle = [
+					//North West
+					[highlat, lowlng],
+					//North East
+					[highlat, highlng],
+					//South East
+					[lowlat, highlng],
+					//South West
+					[lowlat, lowlng],
+					//North West (to close the area)
+					[highlat, lowlng]
+				]
+
+				L.polyline(rectangle, {color: 'purple'}).addTo(mymap)			
+
+
+				latlngs = []; 
+				search_task.push(rectangle)
+			}
+
+
 
 			function onMapClick(e) {
 				var newpos = e.latlng;
-
+				
 				console.log("Task:" + task)
-				if(task === "poly") {
-					doPolyTask(newpos) 
+				if(task === "search") { 
+					doSearchTask(newpos)
 				}
 
 				else if(task === "line") {
@@ -505,17 +586,21 @@ I (Joram Brenz) just put it together and made it work with the MultiDroneCoordin
 			}
 
 			function fly() {
-				var positions = [];
+				var linetasks = [];
 				while (lines.length) {
 					var line = lines.pop();
-					console.log(line.getLatLngs()); 
 					line.remove();
-					positions.push(line.getLatLngs());
+					linetasks.push(line.getLatLngs());
 				}
 
-				tasks.push(positions) 
+				//Index 0 = Line Tasks
+				tasks['line'] = linetasks; 
+
+				//Index 1 = Search Tasks
+				tasks['search'] = search_task;
 
 
+				console.log("JSON: " + tasks['line'])
 				ws.send(JSON.stringify([0, tasks]));
 			}
 
@@ -526,15 +611,13 @@ I (Joram Brenz) just put it together and made it work with the MultiDroneCoordin
 					case "line":
 						this.task = "line"
 						break
-					case "poly":
-						console.log("kake")
+					case "search":
 						prevPos = null
-						this.task="poly"
-
-						document.getElementById("polyTask").style.display="none"; 
-						document.getElementById("savePoly").style.display="block"; 
-
+						this.task="search"
+						document.getElementById("searchTask").style.display="none"; 
+						document.getElementById("saveSearchTask").style.display="block"; 
 						break
+
 					case "pickup":
 						this.task = "pickup"
 						break
@@ -576,6 +659,9 @@ I (Joram Brenz) just put it together and made it work with the MultiDroneCoordin
 					document.getElementById("heading_value").innerHTML = vehicle_heading;
 
 					var time_left = data[5];
+					if(time_left < 0) {
+						kill_vehicle(data[0])
+					}
 					var minutes = parseFloat(Math.round(Math.floor(time_left / 60) * 100) / 100).toFixed(0);
 					var seconds = parseFloat(Math.round((time_left - minutes * 60)* 100) / 100).toFixed(0);
 					document.getElementById("battery_value").innerHTML = minutes + "." + seconds;
@@ -592,10 +678,10 @@ I (Joram Brenz) just put it together and made it work with the MultiDroneCoordin
 					document.getElementById("speed_parameter_value").innerHTML = vehicle_max_speed;
 
 					vehicle_max_battery_time = parseFloat(Math.round(data[7] * 100) / 100).toFixed(0);
-					document.getElementById("battery_life_value").innerHTML = vehicle_max_battery_time;
+					document.getElementById("battery_life_parameter_value").innerHTML = vehicle_max_battery_time;
 
 					vehicle_max_carry_weight = parseFloat(Math.round(data[8] * 100) / 100).toFixed(0);
-					document.getElementById("carry_weight_value").innerHTML = vehicle_max_carry_weight;
+					document.getElementById("carry_weight_parameter_value").innerHTML = vehicle_max_carry_weight;
 				}
 			}
 
@@ -730,7 +816,7 @@ I (Joram Brenz) just put it together and made it work with the MultiDroneCoordin
 			}
 
 
-			function speed_parameter_change_confirm() {
+			function carry_weight_parameter_change_confirm() {
 				document.getElementById('carry_weight_parameter_value').style.display = "block";
 				document.getElementById('carry_weight_parameter_change_button').style.display = "block";
 				document.getElementById('carry_weight_parameter_change_input').style.display = "none";
@@ -745,6 +831,16 @@ I (Joram Brenz) just put it together and made it work with the MultiDroneCoordin
 					document.getElementById('carry_weight_parameter_change_input').value
 					]));
 			}
+
+
+			function reacharge_battery() {
+				ws.send(JSON.stringify([2, this.current_vehicle]));
+			}
+
+			
+			function kill_vehicle(id) {
+			}
+
 
 			init();
 			
