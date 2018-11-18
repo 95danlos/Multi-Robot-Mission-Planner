@@ -40,6 +40,8 @@ def initialize(vehicles, UAV_BASE_PORT):
 				vehicle.max_carry_weight = 10
 				vehicle.start_up_time = time.time()
 				vehicle.nextlocations = []
+				vehicle.groundspeed = 50
+				vehicle.airspeed = 40
 				vehicles.append(vehicle)
 				break
 
