@@ -6,13 +6,11 @@ import dronekit
 """
 Connects and arms all available vehicles based on how many SITL instances is running.
 Each instance needs to be started at forehand using
-
 sim_vehicle.py -L KSFO -I 0 	// vehicle 1
 sim_vehicle.py -L KSFO -I 1		// vehicle 2
 etc..
-
 """
-def initialize(vehicles, UAV_BASE_PORT):
+def initialize(vehicles, UAV_BASE_PORT, server):
 
 	# Number of simulated drones available at startup given as a command line argument
 	instance_count = 0
@@ -40,13 +38,15 @@ def initialize(vehicles, UAV_BASE_PORT):
 				vehicle.max_carry_weight = 10
 				vehicle.start_up_time = time.time()
 				vehicle.nextlocations = []
+				vehicle.groundspeed = 50
+				vehicle.airspeed = 40
 				vehicles.append(vehicle)
 				break
 
-	do_for_all(vehicles, lambda v:arm_and_takeoff(v, 10))
+	do_for_all(vehicles, lambda v:arm_and_takeoff(v, 10, server))
 
 
-def arm_and_takeoff(vehicle, aTargetAltitude):
+def arm_and_takeoff(vehicle, aTargetAltitude, server):
 	"""
 	Arms vehicle and fly to aTargetAltitude.
 	"""
@@ -54,6 +54,7 @@ def arm_and_takeoff(vehicle, aTargetAltitude):
 	print("Vehicle %i: Basic pre-arm checks" % vehicle.id)
 	# Don't try to arm until autopilot is ready
 	print("Vehicle %i: Waiting for vehicle to initialise..."  % vehicle.id)
+	server.send_message_to_all("[\"-1\", \"Waiting for vehicle to initialise...\"]")
 	while not vehicle.is_armable:
 		time.sleep(1)
 
@@ -64,10 +65,12 @@ def arm_and_takeoff(vehicle, aTargetAltitude):
 
 	# Confirm vehicle armed before attempting to take off
 	print("Vehicle %i: Waiting for arming..." % vehicle.id)
+	server.send_message_to_all("[\"-1\", \"Waiting for arming...\"]")
 	while not vehicle.armed:      
 		time.sleep(1)
 
 	print("Vehicle %i: Taking off!" % vehicle.id)
+	server.send_message_to_all("[\"-1\", \"Taking off!\"]")
 	vehicle.simple_takeoff(aTargetAltitude) # Take off to target altitude
 
 	# Wait until the vehicle reaches a safe height before processing the goto (otherwise the command 
@@ -77,6 +80,7 @@ def arm_and_takeoff(vehicle, aTargetAltitude):
 		#Break and return from function just below target altitude.        
 		if vehicle.location.global_relative_frame.alt>=aTargetAltitude*0.95: 
 			print("Vehicle %i: Reached target altitude" % vehicle.id)
+			server.send_message_to_all("[\"-1\", \"Reached target altitude\"]")
 			break
 		time.sleep(1)
 
@@ -150,3 +154,34 @@ def distance(location1, location2):
 
 def is_on_line(drone, location1, location2): 
 	return distance(location1, drone) + distance(location2, drone) == distance(location1, location2)
+
+
+def start_new_simulated_drone(vehicles, UAV_BASE_PORT, server):
+
+		port = UAV_BASE_PORT + 10 * len(vehicles)
+		connection_string = "127.0.0.1:%i" % port #connect to port on localhost
+		
+		# Connect to the Vehicles
+		print('Connecting to vehicle %i on: %s' % (len(vehicles), connection_string))
+		server.send_message_to_all("[\"-1\", \"Connecting to vehicle...\"]")
+		for _ in range(60):
+			try:
+				vehicle = dronekit.connect(connection_string, wait_ready=True)
+			except Exception as e:
+				print(e)
+				time.sleep(1)
+			else:
+				vehicle.id = len(vehicles)
+				vehicle.max_speed = 5
+				vehicle.current_battery = 600
+				vehicle.max_battery_time = 600
+				vehicle.max_carry_weight = 10
+				vehicle.start_up_time = time.time()
+				vehicle.nextlocations = []
+				vehicles.append(vehicle)
+				arm_and_takeoff(vehicle, 10, server)
+				t = threading.Thread(target=lambda:start_data_updating_thread(vehicle, server))
+				t.daemon = True
+				t.start()
+				break
+				

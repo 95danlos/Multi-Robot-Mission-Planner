@@ -9,7 +9,7 @@ I (Joram Brenz) just put it together and made it work with the MultiDroneCoordin
 <html>
 	<head>
 
-		<title>A mission Planner (kind of)</title>
+		<title>Mission Planner</title>
 
 		<meta charset="utf-8" />
 		
@@ -40,21 +40,7 @@ I (Joram Brenz) just put it together and made it work with the MultiDroneCoordin
 				overflow:hidden;
 				z-index:0;
 			}
-			
-			.buttonBox_search{
-				position:absolute;
-				top:80px;
-				right:20px;
-				z-index:1000;
-				height: 50px;
-				width: 80px;
-			}
-			.button_search{
-				height: 100%;
-				width: 100%;
-				font-size: 20px;
-				opacity: 0.7;
-			}
+
 			.flight_data{
 				position:absolute;
 				bottom:5px;
@@ -106,6 +92,7 @@ I (Joram Brenz) just put it together and made it work with the MultiDroneCoordin
 				z-index:1000;
 				font-size: 15px;
 				opacity: 0.7;
+				box-shadow: 0 1px 5px blue;
 			}
 			.parameter_button{
 				position:absolute;
@@ -278,31 +265,96 @@ I (Joram Brenz) just put it together and made it work with the MultiDroneCoordin
 				opacity: 0.7;
 				display: none
 			}
-
-
 			.buttonBox_fly{
 				position:absolute;
 				top:20px;
 				right:20px;
 				z-index:1000;
-				height: 50px;
+				height: 300px;
 				width: 150px;
 			}
 			.button_fly{
-				height: 100%;
+				height: 60px;
 				width: 100%;
 				font-size: 20px;
 				opacity: 0.7;
+				margin-bottom: 20px;
 			}
-
 			.button_task {
-				height: 70%; 
+				height: 40px; 
 				width: 100%; 
 				font-size: 18px; 
 				opacity: 0.7; 
 			}
-			.poly {
+			.clear_tasks {
+				height: 40px; 
+				width: 100%; 
+				font-size: 18px; 
+				opacity: 0.7; 
+				margin-top: 30px;
+			}
+			.search {
 				display: none; 
+				font-size: 1.0em; 
+			}
+			.add_drone_box {
+				position: absolute;
+				z-index:1000;
+				bottom: 420px;
+				left: 20px;
+				height: 100px; 
+				width: 300px; 
+				opacity: 0.7; 
+			}
+			.add_drone_button {
+				position: absolute;
+				z-index:1001;
+				top: 50px;
+				left: 0px;
+				height: 40px; 
+				width: 80px; 
+			}
+			.add_new_drone_command {
+				position: absolute;
+				top: 50px;
+				left: 0px;
+				height: 30px; 
+				width: 300px;
+				display: none;
+			}
+			.copy_to_clipboard {
+				position: absolute;
+				top: 50px;
+				left: 300px;
+				height: 37px; 
+				width: 70px; 
+				display: none;
+			}
+			.add_new_drone_connect_button {
+				position: absolute;
+				z-index:1001;
+				top: 0px;
+				left: 0px;
+				height: 40px; 
+				width: 80px;
+				display: none;
+			}
+			.add_new_drone_cancel_button {
+				position: absolute;
+				z-index:1001;
+				top: 0px;
+				left: 100px;
+				height: 40px; 
+				width: 80px;
+				display: none;
+			}
+			.new_drone_status {
+				position: absolute;
+				top: 70px;
+				left: 0px;
+				height: 40px; 
+				width: 300px;
+				font-size: 20px;
 			}
 		</style>
 
@@ -315,9 +367,22 @@ I (Joram Brenz) just put it together and made it work with the MultiDroneCoordin
 		<div class="buttonBox_fly">
 			<input id="submitButton" class="button_fly" type="button" value="Fly" onclick="fly();" />
 			<input id="lineTask" class="button_task" type="button" value="Line task" onclick="setTask('line'); " />
-			<input id="polyTask" class="button_task" type="button" value="Poly task" onclick="setTask('poly'); " />
-			<input id="savePoly" class="button_task poly" type="button" value="Save Polytask" onclick="savePoly(); "/>
+			<input id="searchTask" class="button_task" type="button" value="Search Task" onclick="setTask('search'); " />
+			<input id="saveSearchTask" class="button_task search" type="button" value="Save Search Task" onclick="saveSearchTask(); "/>
 			<input id="pickupTask" class="button_task" type="button" value="Pick-up task" onclick="setTask('pickup');" />
+			<input id="clear_tasks" class="clear_tasks" type="button" value="Clear Tasks" onclick="clear_tasks();" />
+		</div>
+
+		<!--
+			Add new drone button
+		-->
+		<div class="add_drone_box">
+			<input id="add_drone_button" class="add_drone_button" type="button" value="Add Drone" onclick="add_drone();" />
+			<input id="add_new_drone_command" class="add_new_drone_command" type="input" value="" />
+			<input id="copy_to_clipboard" class="copy_to_clipboard" type="button" value="Copy" onclick="copy_to_clipboard();" />
+			<input id="add_new_drone_connect_button" class="add_new_drone_connect_button" type="button" value="Connect" onclick="add_drone_connect();" />
+			<input id="add_new_drone_cancel_button" class="add_new_drone_cancel_button" type="button" value="Cancel" onclick="add_drone_cancel();" />
+			<div id="new_drone_status" class="new_drone_status"></div>
 		</div>
 
 		<!--
@@ -375,15 +440,16 @@ I (Joram Brenz) just put it together and made it work with the MultiDroneCoordin
 		<noscript>
 			Please activate JavaScript in your Browser for this Frontend to work.
 		</noscript>
-		<script>
 
+
+		<script>
 			//What task the user wants to create. Default is linetask
 			var task = "line"
-
+			document.getElementById("lineTask").style.boxShadow = "0 1px 5px blue";
+			document.getElementById("saveSearchTask").style.boxShadow = "0 1px 5px blue";
 			//60.396346, 5.321288 # Bergen
 			//37.619374, -122.376637 # San Francisco
 			var mymap = L.map('mapid').setView([37.619374, -122.376637], 17);
-
 			// this access token is the one used in the examples of the tutorial
 			// in theory one should get an own one, but it works for now and that's all I want for testing
 			L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token=pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpejY4NXVycTA2emYycXBndHRqcmZ3N3gifQ.rJcFIG214AriISLbB6B5aw', {
@@ -394,16 +460,39 @@ I (Joram Brenz) just put it together and made it work with the MultiDroneCoordin
 				id: 'mapbox.streets'
 			}).addTo(mymap);
 
+			// create custom icon
+			var drone_icon = L.icon({
+				iconUrl: 'https://ubisafe.org/images/drone-drawing-clipart-5.png',
+				iconSize: [30, 30],
+			});
+			var drone_icon_big = L.icon({
+				iconUrl: 'https://ubisafe.org/images/drone-drawing-clipart-5.png',
+				iconSize: [50, 50],
+			});	
+				var drone_icon_dead = L.icon({
+				iconUrl: 'https://www.freeiconspng.com/uploads/explosion-icon-30.png',
+				iconSize: [50, 50],
+			});	
+				
+						
 			var startposmarker = L.marker([0,0]);
 			var startpos = null;
 			var lines = [];
-			var polylines = []; 
-			var polygons = []; 
+			var polygons = [];
+			var search_task = []; 
+			var search_markers = []; 
+			var red_lines = [];
 			var prevPos = null; 
+			var latlngs = []; 
 
+			var permanent_lines = []
+			var permanent_polygons = []
+			var permanent_red_lines = []
+
+			this.battery_data = {}
 			//This is the array that will be sent to the server. It will contain all the different tasks, each index corresponding to a specific task
 			//0 = linetask, 1 = polygontask, 2 = pickup task (not implemented)
-			var tasks = []; 
+			var tasks = {}; 
 			
 			function doPolyTask(npos) {
 				var newpos = npos
@@ -413,7 +502,6 @@ I (Joram Brenz) just put it together and made it work with the MultiDroneCoordin
 					startposmarker.setLatLng(startpos);
 					startposmarker.addTo(mymap);
 				}
-
 				//All the other times
 				else {
 				
@@ -427,64 +515,93 @@ I (Joram Brenz) just put it together and made it work with the MultiDroneCoordin
 					prevPos = newpos; 
 				}
 			}
-
-				function doLineTask(npos) {
+			function doLineTask(npos) {
 				var newpos = npos
 				if (startpos == null) {
-					startpos = newpos;
-					startposmarker.setLatLng(startpos);
+					startposmarker.setLatLng(npos);
 					startposmarker.addTo(mymap);
+					startpos = npos;
 				}
 				else {
-					var line = L.polyline([startpos, newpos]);
+					var line = L.polyline([startpos, npos]);
 					line.addTo(mymap);
 					lines.push(line);
 					startpos = null;
 					startposmarker.remove();
 				}
 			}
-
-			function savePoly() {
-
-
-				polygons.push(polylines)
-
-				polylines = []
-
-				console.log(polygons[0])
-
-				document.getElementById("polyTask").style.display="block"; 
-				document.getElementById("savePoly").style.display="none"; 
+			function doSearchTask(npos) {
+				var marker = L.marker(npos)
+				search_markers.push(marker)
+				marker.addTo(mymap)
+				latlngs.push(npos); 
 			}
-
+			function saveSearchTask() {
+				if(latlngs.length > 3) {
+					red_lines.push(L.polyline(latlngs, {color: 'red'}).addTo(mymap))
+					createSearchRectangle();
+				} 
+				//clear markers
+				for(let i = 0; i < search_markers.length; i++) {
+					startposmarker = search_markers[i]
+					startposmarker.remove(); 
+				}
+				search_markers = []; 
+				setTask("none")
+			}
+			function createSearchRectangle() {
+				var lowlat = 90, lowlng = 180
+				var highlat = -90, highlng = -180
+				for (let i = 0; i < latlngs.length; i++) {
+					if (latlngs[i]['lng'] <= lowlng)
+						lowlng = latlngs[i]['lng']
+					if(latlngs[i]['lng'] >= highlng) {
+						highlng = latlngs[i]['lng']
+					}
+					if(latlngs[i]['lat'] <= lowlat)
+						lowlat = latlngs[i]['lat']
+					if(latlngs[i]['lat'] >= highlat)
+						highlat = latlngs[i]['lat'];
+				}
+				console.log(highlng)
+				var rectangle = [
+					//North West
+					[highlat, lowlng],
+					//North East
+					[highlat, highlng],
+					//South East
+					[lowlat, highlng],
+					//South West
+					[lowlat, lowlng]
+				]
+				console.log(rectangle)
+				polygons.push(L.polygon(rectangle, {color: 'purple'}).addTo(mymap))		
+				latlngs = []; 
+				search_task.push(rectangle)
+			}
 			function onMapClick(e) {
 				var newpos = e.latlng;
-
+				
 				console.log("Task:" + task)
-				if(task === "poly") {
-					doPolyTask(newpos) 
+				if(task === "search") { 
+					console.log(newpos)
+					doSearchTask(newpos)
 				}
-
 				else if(task === "line") {
 					doLineTask(newpos)
 				}
-
 				else if(task === "pickup") {
 					doPickupTask(newpos)
 				}
 				
 			}
-
 			mymap.on('click', onMapClick);
-
 			var drone_markers_and_traces = new Map();
-
 			var ws;
 			var number_of_vehicles = 0
 			var current_vehicle = 0
 						
 			function init() {
-
 				// Connect to Web Socket
 				ws = new WebSocket("ws://localhost:9001/");
 	
@@ -496,11 +613,19 @@ I (Joram Brenz) just put it together and made it work with the MultiDroneCoordin
 				ws.onmessage = function(e) {
 					var data = JSON.parse(e.data);
 					
-					update_drone_position(data)
-					update_flight_data(data)
-					update_parameters(data)
-					highlight_vehicle(this.current_vehicle)
-
+					// New Simulated drone status message
+					if(data[0] === "-1") {
+						update_new_drone_status(data)
+					}
+					// Existing drone data
+					else {
+						update_drone_position(data)
+						update_flight_data(data)
+						update_parameters(data)
+						highlight_vehicle(this.current_vehicle)
+						check_battery(data)
+						fix_buttons()
+					}
 				}.bind(this);
 				
 				ws.onclose = function() {
@@ -513,78 +638,65 @@ I (Joram Brenz) just put it together and made it work with the MultiDroneCoordin
 					console.log(e);
 					alert(e);
 				};
-
 			}
-
 			function fly() {
 				var linetasks = [];
-				while (lines.length) {
-					var line = lines.pop();
-					console.log(line.getLatLngs()); 
-					line.remove();
-					linetasks.push(line.getLatLngs());
+				for (i=0; i < lines.length; i++) {
+					linetasks.push(lines[i].getLatLngs());
 				}
-
-				tasks[0] = linetasks; 
-
-				var polygontasks = []; 
-				var j = 0; 
-				while (j < polygons.length) {
-					polygon = polygons[j]
-					console.log(polygons.length)
-
-					var i = 0; 
-
-					while( i < polygon.length) {
-						var line = polygon[i];
-						line.remove()
-						polygon[i] = line.getLatLngs(); 
-
-						i++;  
-					}
-					j++; 
-				}
-
-				console.log(polygons.length)
-				tasks[1] = polygons;
-
-
+				//Index 0 = Line Tasks
+				tasks['line'] = linetasks; 
+				//Index 1 = Search Tasks
+				tasks['search'] = search_task;
+				console.log("JSON: " + tasks)
 				ws.send(JSON.stringify([0, tasks]));
+				//Clear search_task
+				search_task = []
+				add_permanent_markers()
+				
 			}
-
 			function setTask(task) {
 				console.log("Setting task: " + task)
 				startpos = null
+				this.task = task
 				switch(task) {
 					case "line":
-						this.task = "line"
+						document.getElementById("searchTask").style.display="block"; 
+						document.getElementById("saveSearchTask").style.display="none"; 
+						document.getElementById("lineTask").style.boxShadow = "0 1px 5px blue";
+						document.getElementById("pickupTask").style.boxShadow = "none";
 						break
-					case "poly":
-						console.log("kake")
-						prevPos = null
-						this.task="poly"
-
-						document.getElementById("polyTask").style.display="none"; 
-						document.getElementById("savePoly").style.display="block"; 
-
+					case "search":
+						document.getElementById("searchTask").style.display="none"; 
+						document.getElementById("saveSearchTask").style.display="block";
+						document.getElementById("lineTask").style.boxShadow = "none";
+						document.getElementById("pickupTask").style.boxShadow = "none";
 						break
 					case "pickup":
-						this.task = "pickup"
+						document.getElementById("searchTask").style.display="block"; 
+						document.getElementById("saveSearchTask").style.display="none"; 
+						document.getElementById("pickupTask").style.boxShadow = "0 1px 5px blue";
+						document.getElementById("lineTask").style.boxShadow = "none";
+						break
+					case "none":
+						document.getElementById("searchTask").style.display="block"; 
+						document.getElementById("saveSearchTask").style.display="none"; 
+						document.getElementById("pickupTask").style.boxShadow = "none";
+						document.getElementById("lineTask").style.boxShadow = "none";
 						break
 				} 
+				
 			}
-
 			function update_drone_position(data) {
 					var id = data[0];
 					var position = data[1];
-
 					// If new drone, add marker
 					if (!drone_markers_and_traces.has(id)) {
-						var new_drone_marker = L.circleMarker(position,{color:'red',radius:"10"}).bindTooltip("Vehicle "+(id+1)).addTo(mymap);
+						//var new_drone_marker = L.marker(position,{color:'red',radius:"10", icon: firefoxIcon}).bindTooltip("Vehicle "+(id+1)).addTo(mymap);
+						var new_drone_marker = L.marker(position,{icon: drone_icon}).bindTooltip("Vehicle "+(id+1)).addTo(mymap);
 						var new_drone_trace = L.polyline([position],{color:'green'}).addTo(mymap);
 						drone_markers_and_traces.set(id, [new_drone_marker, new_drone_trace]);
 						this.number_of_vehicles ++;
-
 					// else update marker
 					} else {
 						var drone_marker_and_trace = drone_markers_and_traces.get(id);
@@ -592,94 +704,110 @@ I (Joram Brenz) just put it together and made it work with the MultiDroneCoordin
 						drone_marker_and_trace[1].addLatLng(position);
 					}
 			}
-
-
 			function update_flight_data(data) {
 				var id = data[0];
-
 				// Only show flight data for the currently selected vehicle
 				if(this.current_vehicle === id) {
 					vehicle_attitude = parseFloat(Math.round(data[2] * 100) / 100).toFixed(1);
 					document.getElementById("altitude_value").innerHTML = vehicle_attitude;
-
 					vehicle_speed = parseFloat(Math.round(data[3] * 100) / 100).toFixed(1);
 					document.getElementById("speed_value").innerHTML = vehicle_speed;
-
 					vehicle_heading = parseFloat(Math.round(data[4] * 100) / 100).toFixed(0);
 					document.getElementById("heading_value").innerHTML = vehicle_heading;
-
 					var time_left = data[5];
-					if(time_left < 0) {
-						kill_vehicle(data[0])
-					}
 					var minutes = parseFloat(Math.round(Math.floor(time_left / 60) * 100) / 100).toFixed(0);
 					var seconds = parseFloat(Math.round((time_left - minutes * 60)* 100) / 100).toFixed(0);
-					document.getElementById("battery_value").innerHTML = minutes + "." + seconds;
+					if (time_left > 0) {
+						document.getElementById("battery_value").innerHTML = minutes + "." + seconds;
+					} 
+					else {
+						document.getElementById("battery_value").innerHTML = "0.0";
+					}
 				}
 			}
-
-
 			function update_parameters(data) {
 				var id = data[0];
-
 				// Only show parameters for the currently selected vehicle
 				if(this.current_vehicle === id) {
 					vehicle_max_speed = parseFloat(Math.round(data[6] * 100) / 100).toFixed(2);
 					document.getElementById("speed_parameter_value").innerHTML = vehicle_max_speed;
-
 					vehicle_max_battery_time = parseFloat(Math.round(data[7] * 100) / 100).toFixed(0);
 					document.getElementById("battery_life_parameter_value").innerHTML = vehicle_max_battery_time;
-
 					vehicle_max_carry_weight = parseFloat(Math.round(data[8] * 100) / 100).toFixed(0);
 					document.getElementById("carry_weight_parameter_value").innerHTML = vehicle_max_carry_weight;
 				}
 			}
-
-
 			function next_vehicle() {
 				if(this.current_vehicle < this.number_of_vehicles - 1) {
 					this.current_vehicle += 1
 					document.getElementById("current_vehicle_text").innerHTML = this.current_vehicle + 1 ;
 					highlight_vehicle(this.current_vehicle)				
 					remove_highlight_from_vehicle(this.current_vehicle - 1)
+					fix_buttons()
 				}
 			}
-
 			function prev_vehicle() {
 				if(this.current_vehicle !== 0) {
 					this.current_vehicle -= 1
 					document.getElementById("current_vehicle_text").innerHTML = this.current_vehicle + 1 ;
 					highlight_vehicle(this.current_vehicle)				
 					remove_highlight_from_vehicle(this.current_vehicle + 1)
+					fix_buttons()
 				}
 			}
-
-
 			function highlight_vehicle(id) {
 				var drone_marker_and_trace = drone_markers_and_traces.get(id);
-				drone_marker_and_trace[0].setRadius(15);
-				drone_marker_and_trace[0].setStyle({color:'green'});
+				if (this.battery_data[id] === "empty") {
+					drone_marker_and_trace[0].setIcon(drone_icon_dead);
+				}
+				else {
+					drone_marker_and_trace[0].setIcon(drone_icon_big);
+				}
+				//drone_marker_and_trace[0].setRadius(15);
+				//drone_marker_and_trace[0].setStyle({color:'green'});
 			}
 			
-
 			function remove_highlight_from_vehicle(id) {
-				var drone_marker_and_trace = drone_markers_and_traces.get(id);;
-				drone_marker_and_trace[0].setRadius(10);
-				drone_marker_and_trace[0].setStyle({color:'red'});
+				var drone_marker_and_trace = drone_markers_and_traces.get(id);
+				if (this.battery_data[id] === "empty") {
+					drone_marker_and_trace[0].setIcon(drone_icon_dead);
+				}
+				else {
+					drone_marker_and_trace[0].setIcon(drone_icon);
+				}
+				//drone_marker_and_trace[0].setRadius(15);
+				//drone_marker_and_trace[0].setStyle({color:'green'});
 			}
 
+			function fix_buttons() {
+				// enable or disable prev button
+				if(this.current_vehicle === 0 || this.number_of_vehicles === 0) {
+					document.getElementById("prev_vehicle_button").disabled = true;
+				}
+				else {
+					document.getElementById("prev_vehicle_button").disabled = false;
+				}
+				// enable or disable next button
+				if(this.current_vehicle === this.number_of_vehicles - 1) {
+					document.getElementById("next_vehicle_button").disabled = true;
+				}
+				else {
+					document.getElementById("next_vehicle_button").disabled = false;
+				}
+			}
 
 			function show_flight_data_tab() {
 				document.getElementById('flight_data_tab').style.display = "block";
 				document.getElementById('parameter_tab').style.display = "none";
+				document.getElementById('flight_data_button').style.boxShadow = "0 1px 5px blue";
+				document.getElementById('parameter_button').style.boxShadow = "none";
 			}
-
-
 			function show_parameter_tab() {
 				document.getElementById('flight_data_tab').style.display = "none";
 				document.getElementById('parameter_tab').style.display = "block";
+				document.getElementById('flight_data_button').style.boxShadow = "none";
+				document.getElementById('parameter_button').style.boxShadow = "0 1px 5px blue";
 			}
-
 			
 			function speed_parameter_change_button() {
 				document.getElementById('speed_parameter_value').style.display = "none";
@@ -688,7 +816,6 @@ I (Joram Brenz) just put it together and made it work with the MultiDroneCoordin
 				document.getElementById('speed_parameter_change_button_cancel').style.display = "block";
 				document.getElementById('speed_parameter_change_button_confirm').style.display = "block";
 			}
-
 			function speed_parameter_change_cancel() {
 				document.getElementById('speed_parameter_value').style.display = "block";
 				document.getElementById('speed_parameter_change_button').style.display = "block";
@@ -696,15 +823,12 @@ I (Joram Brenz) just put it together and made it work with the MultiDroneCoordin
 				document.getElementById('speed_parameter_change_button_cancel').style.display = "none";
 				document.getElementById('speed_parameter_change_button_confirm').style.display = "none";
 			}
-
-
 			function speed_parameter_change_confirm() {
 				document.getElementById('speed_parameter_value').style.display = "block";
 				document.getElementById('speed_parameter_change_button').style.display = "block";
 				document.getElementById('speed_parameter_change_input').style.display = "none";
 				document.getElementById('speed_parameter_change_button_cancel').style.display = "none";
 				document.getElementById('speed_parameter_change_button_confirm').style.display = "none";
-
 				ws.send(JSON.stringify([
 					1, 
 					this.current_vehicle, 
@@ -713,8 +837,6 @@ I (Joram Brenz) just put it together and made it work with the MultiDroneCoordin
 					document.getElementById('carry_weight_parameter_change_input').value
 					]));
 			}
-
-
 			function battery_life_parameter_change_button() {
 				document.getElementById('battery_life_parameter_value').style.display = "none";
 				document.getElementById('battery_life_parameter_change_button').style.display = "none";
@@ -722,7 +844,6 @@ I (Joram Brenz) just put it together and made it work with the MultiDroneCoordin
 				document.getElementById('battery_life_parameter_change_button_cancel').style.display = "block";
 				document.getElementById('battery_life_parameter_change_button_confirm').style.display = "block";
 			}
-
 			function battery_life_parameter_change_cancel() {
 				document.getElementById('battery_life_parameter_value').style.display = "block";
 				document.getElementById('battery_life_parameter_change_button').style.display = "block";
@@ -730,15 +851,12 @@ I (Joram Brenz) just put it together and made it work with the MultiDroneCoordin
 				document.getElementById('battery_life_parameter_change_button_cancel').style.display = "none";
 				document.getElementById('battery_life_parameter_change_button_confirm').style.display = "none";
 			}
-
-
 			function battery_life_parameter_change_confirm() {
 				document.getElementById('battery_life_parameter_value').style.display = "block";
 				document.getElementById('battery_life_parameter_change_button').style.display = "block";
 				document.getElementById('battery_life_parameter_change_input').style.display = "none";
 				document.getElementById('battery_life_parameter_change_button_cancel').style.display = "none";
 				document.getElementById('battery_life_parameter_change_button_confirm').style.display = "none";
-
 				ws.send(JSON.stringify([
 					1, 
 					this.current_vehicle, 
@@ -747,8 +865,6 @@ I (Joram Brenz) just put it together and made it work with the MultiDroneCoordin
 					document.getElementById('carry_weight_parameter_change_input').value
 					]));
 			}
-
-
 			function carry_weight_parameter_change_button() {
 				document.getElementById('carry_weight_parameter_value').style.display = "none";
 				document.getElementById('carry_weight_parameter_change_button').style.display = "none";
@@ -756,7 +872,6 @@ I (Joram Brenz) just put it together and made it work with the MultiDroneCoordin
 				document.getElementById('carry_weight_parameter_change_button_cancel').style.display = "block";
 				document.getElementById('carry_weight_parameter_change_button_confirm').style.display = "block";
 			}
-
 			function carry_weight_parameter_change_cancel() {
 				document.getElementById('carry_weight_parameter_value').style.display = "block";
 				document.getElementById('carry_weight_parameter_change_button').style.display = "block";
@@ -764,15 +879,12 @@ I (Joram Brenz) just put it together and made it work with the MultiDroneCoordin
 				document.getElementById('carry_weight_parameter_change_button_cancel').style.display = "none";
 				document.getElementById('carry_weight_parameter_change_button_confirm').style.display = "none";
 			}
-
-
 			function carry_weight_parameter_change_confirm() {
 				document.getElementById('carry_weight_parameter_value').style.display = "block";
 				document.getElementById('carry_weight_parameter_change_button').style.display = "block";
 				document.getElementById('carry_weight_parameter_change_input').style.display = "none";
 				document.getElementById('carry_weight_parameter_change_button_cancel').style.display = "none";
 				document.getElementById('carry_weight_parameter_change_button_confirm').style.display = "none";
-
 				ws.send(JSON.stringify([
 					1, 
 					this.current_vehicle, 
@@ -781,20 +893,113 @@ I (Joram Brenz) just put it together and made it work with the MultiDroneCoordin
 					document.getElementById('carry_weight_parameter_change_input').value
 					]));
 			}
-
-
 			function reacharge_battery() {
 				ws.send(JSON.stringify([2, this.current_vehicle]));
 			}
-
 			
-			function kill_vehicle(id) {
+			function check_battery(data) {
+				var time = data[5];
+				if (time < 0) {
+					this.battery_data[data[0]] = "empty"
+				}
+				else {
+					this.battery_data[data[0]] = "not_empty"
+				}
+			}
+
+			function add_drone() {
+				document.getElementById("add_new_drone_command").value = " sim_vehicle.py -v ArduCopter -L KSFO -I " + number_of_vehicles;
+				document.getElementById('add_new_drone_command').style.display = "block";
+				document.getElementById('copy_to_clipboard').style.display = "block";
+				document.getElementById('add_new_drone_connect_button').style.display = "block";
+				document.getElementById('add_new_drone_cancel_button').style.display = "block";
+				document.getElementById('add_drone_button').style.display = "none";
+			}
+
+			function add_drone_cancel() {
+				document.getElementById("add_new_drone_command").value = "";
+				document.getElementById('add_new_drone_command').style.display = "none";
+				document.getElementById('copy_to_clipboard').style.display = "none";
+				document.getElementById('add_new_drone_connect_button').style.display = "none";
+				document.getElementById('add_new_drone_cancel_button').style.display = "none";
+				document.getElementById('add_drone_button').style.display = "block";
+			}
+
+			function add_drone_connect() {
+				document.getElementById("add_new_drone_command").value = "";
+				document.getElementById('add_new_drone_command').style.display = "none";
+				document.getElementById('copy_to_clipboard').style.display = "none";
+				document.getElementById('add_new_drone_connect_button').style.display = "none";
+				document.getElementById('add_new_drone_cancel_button').style.display = "none";
+				document.getElementById('add_drone_button').style.display = "none";
+				document.getElementById("new_drone_status").style.display = "block";
+				ws.send(JSON.stringify([4]));
+			}
+
+			function copy_to_clipboard() {
+				document.getElementById("add_new_drone_command").select();
+				document.execCommand("copy");
+				ws.send(JSON.stringify([3]));
 			}
 
 
+			function update_new_drone_status(data) {
+				if(data[1] === "Reached target altitude") {
+					document.getElementById("new_drone_status").innerHTML = "";
+					document.getElementById('add_drone_button').style.display = "block";
+					document.getElementById("new_drone_status").style.display = "none";
+				}
+				else {
+					document.getElementById("new_drone_status").innerHTML = data[1];
+				}
+			}
+
+			function clear_tasks() {
+				startposmarker.remove();
+				startposmarker = L.marker([0,0]);
+				startpos = null;
+				latlngs = []; 
+				while (lines.length) {
+					var line = lines.pop();
+					line.remove();
+				}
+				while (search_markers.length) {
+					marker = search_markers.pop()
+					marker.remove();
+				}
+				while (polygons.length) {
+					polygon = polygons.pop()
+					polygon.remove(); 
+				}
+				while (search_task.length) {
+					task = search_task.pop()
+				}
+				while (red_lines.length) {
+					line = red_lines.pop()
+					line.remove();
+				}
+			}
+
+			function add_permanent_markers() {
+				while (lines.length) {
+					var line = lines.pop();
+					line.setStyle({color:'orange'});
+					this.permanent_lines.push(line)
+				}
+				
+				while (polygons.length) {
+					polygon = polygons.pop()
+					polygon.setStyle({color:'orange'});
+					this.permanent_polygons.push(polygon)
+				}
+				while (red_lines.length) {
+					red_line = red_lines.pop()
+					this.permanent_red_lines.push(red_line)
+				}
+			}
+
 			init();
 			
-
 		</script>
 				
 	</body>
