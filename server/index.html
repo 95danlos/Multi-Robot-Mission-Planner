@@ -293,7 +293,7 @@ I (Joram Brenz) just put it together and made it work with the MultiDroneCoordin
 				opacity: 0.7; 
 				margin-top: 30px;
 			}
-			.search {
+			.hide {
 				display: none; 
 				font-size: 1.0em; 
 			}
@@ -356,20 +356,33 @@ I (Joram Brenz) just put it together and made it work with the MultiDroneCoordin
 				width: 300px;
 				font-size: 20px;
 			}
+			.error_message {
+				position: absolute;
+				text-align: center;
+				top: 30%;
+				left: 30%;
+				width: 40%;
+				font-size: 40px;
+				color: red;
+				z-index: 1001;
+			}
 		</style>
 
 	</head>
 
 	<body height = 100% width = 100%>
+			<div id="error_message" class="error_message"></div>
 		<!--
 			Fly and search buttons
 		-->
 		<div class="buttonBox_fly">
 			<input id="submitButton" class="button_fly" type="button" value="Fly" onclick="fly();" />
 			<input id="lineTask" class="button_task" type="button" value="Line task" onclick="setTask('line'); " />
-			<input id="searchTask" class="button_task" type="button" value="Search Task" onclick="setTask('search'); " />
-			<input id="saveSearchTask" class="button_task search" type="button" value="Save Search Task" onclick="saveSearchTask(); "/>
 			<input id="pickupTask" class="button_task" type="button" value="Pick-up task" onclick="setTask('pickup');" />
+			<input id="searchTask" class="button_task" type="button" value="Search Task" onclick="setTask('search'); " />
+			<input id="saveSearchTask" class="button_task hide" type="button" value="Save Search Task" onclick="saveSearchTask(); "/>
+			<input id="obstacle" class="button_task" type="button" value="Obstacle" onclick="setTask('obstacle'); " />
+			<input id="save_obstacle" class="button_task hide" type="button" value="Save Obstacle" onclick="saveObstacle(); "/>
 			<input id="clear_tasks" class="clear_tasks" type="button" value="Clear Tasks" onclick="clear_tasks();" />
 		</div>
 
@@ -447,6 +460,7 @@ I (Joram Brenz) just put it together and made it work with the MultiDroneCoordin
 			var task = "line"
 			document.getElementById("lineTask").style.boxShadow = "0 1px 5px blue";
 			document.getElementById("saveSearchTask").style.boxShadow = "0 1px 5px blue";
+			document.getElementById("save_obstacle").style.boxShadow = "0 1px 5px blue";
 			//60.396346, 5.321288 # Bergen
 			//37.619374, -122.376637 # San Francisco
 			var mymap = L.map('mapid').setView([37.619374, -122.376637], 17);
@@ -481,6 +495,8 @@ I (Joram Brenz) just put it together and made it work with the MultiDroneCoordin
 			var polygons = [];
 			var search_task = []; 
 			var search_markers = []; 
+			var obstacles = []; 
+			var obstacle_markers = []; 
 			var red_lines = [];
 			var prevPos = null; 
 			var latlngs = []; 
@@ -536,20 +552,38 @@ I (Joram Brenz) just put it together and made it work with the MultiDroneCoordin
 				marker.addTo(mymap)
 				latlngs.push(npos); 
 			}
+			function doObstacle(npos) {
+				var marker = L.marker(npos)
+				obstacle_markers.push(marker)
+				marker.addTo(mymap)
+				latlngs.push(npos); 
+			}
 			function saveSearchTask() {
 				if(latlngs.length > 3) {
 					red_lines.push(L.polyline(latlngs, {color: 'red'}).addTo(mymap))
-					createSearchRectangle();
-				} 
-				//clear markers
-				for(let i = 0; i < search_markers.length; i++) {
-					startposmarker = search_markers[i]
-					startposmarker.remove(); 
+					rectangle = createRectangle();
+					polygons.push(L.polygon(rectangle, {color: "purple"}).addTo(mymap))		
+					search_task.push(rectangle)
+					clear_markers()
+					setTask("none")
 				}
-				search_markers = []; 
-				setTask("none")
+				else {
+					display_error_message("Place atleast 4 markers")
+				}
 			}
-			function createSearchRectangle() {
+			function saveObstacle() {
+				if(latlngs.length > 3) {
+					//red_lines.push(L.polyline(latlngs, {color: 'red'}).addTo(mymap))
+					obstacle = createRectangle();
+					obstacles.push(L.polygon(obstacle, {color: "red"}).addTo(mymap))		
+					clear_markers()
+					setTask("none")
+				}
+				else {
+					display_error_message("Place atleast 4 markers")
+				}
+			}
+			function createRectangle() {
 				var lowlat = 90, lowlng = 180
 				var highlat = -90, highlng = -180
 				for (let i = 0; i < latlngs.length; i++) {
@@ -563,8 +597,7 @@ I (Joram Brenz) just put it together and made it work with the MultiDroneCoordin
 					if(latlngs[i]['lat'] >= highlat)
 						highlat = latlngs[i]['lat'];
 				}
-				console.log(highlng)
-				var rectangle = [
+				return rectangle = [
 					//North West
 					[highlat, lowlng],
 					//North East
@@ -574,11 +607,9 @@ I (Joram Brenz) just put it together and made it work with the MultiDroneCoordin
 					//South West
 					[lowlat, lowlng]
 				]
-				console.log(rectangle)
-				polygons.push(L.polygon(rectangle, {color: 'purple'}).addTo(mymap))		
-				latlngs = []; 
-				search_task.push(rectangle)
 			}
+
+
 			function onMapClick(e) {
 				var newpos = e.latlng;
 				
@@ -592,6 +623,9 @@ I (Joram Brenz) just put it together and made it work with the MultiDroneCoordin
 				}
 				else if(task === "pickup") {
 					doPickupTask(newpos)
+				}
+				else if(task === "obstacle") {
+					doObstacle(newpos)
 				}
 				
 			}
@@ -648,6 +682,8 @@ I (Joram Brenz) just put it together and made it work with the MultiDroneCoordin
 				tasks['line'] = linetasks; 
 				//Index 1 = Search Tasks
 				tasks['search'] = search_task;
+				//Index 2 = obstacles
+				tasks['obstacle'] = obstacles;
 				console.log("JSON: " + tasks)
 				ws.send(JSON.stringify([0, tasks]));
 				//Clear search_task
@@ -657,30 +693,46 @@ I (Joram Brenz) just put it together and made it work with the MultiDroneCoordin
 			}
 			function setTask(task) {
 				console.log("Setting task: " + task)
-				startpos = null
+				clear_markers()
 				this.task = task
 				switch(task) {
 					case "line":
 						document.getElementById("searchTask").style.display="block"; 
 						document.getElementById("saveSearchTask").style.display="none"; 
+						document.getElementById("obstacle").style.display="block"; 
+						document.getElementById("save_obstacle").style.display="none"; 
 						document.getElementById("lineTask").style.boxShadow = "0 1px 5px blue";
 						document.getElementById("pickupTask").style.boxShadow = "none";
 						break
 					case "search":
 						document.getElementById("searchTask").style.display="none"; 
 						document.getElementById("saveSearchTask").style.display="block";
+						document.getElementById("obstacle").style.display="block"; 
+						document.getElementById("save_obstacle").style.display="none"; 
 						document.getElementById("lineTask").style.boxShadow = "none";
 						document.getElementById("pickupTask").style.boxShadow = "none";
 						break
 					case "pickup":
 						document.getElementById("searchTask").style.display="block"; 
-						document.getElementById("saveSearchTask").style.display="none"; 
+						document.getElementById("saveSearchTask").style.display="none";
+						document.getElementById("obstacle").style.display="block"; 
+						document.getElementById("save_obstacle").style.display="none"; 
 						document.getElementById("pickupTask").style.boxShadow = "0 1px 5px blue";
 						document.getElementById("lineTask").style.boxShadow = "none";
 						break
 					case "none":
 						document.getElementById("searchTask").style.display="block"; 
-						document.getElementById("saveSearchTask").style.display="none"; 
+						document.getElementById("saveSearchTask").style.display="none";
+						document.getElementById("obstacle").style.display="block"; 
+						document.getElementById("save_obstacle").style.display="none"; 
+						document.getElementById("pickupTask").style.boxShadow = "none";
+						document.getElementById("lineTask").style.boxShadow = "none";
+						break
+					case "obstacle":
+						document.getElementById("searchTask").style.display="block"; 
+						document.getElementById("saveSearchTask").style.display="none";
+						document.getElementById("obstacle").style.display="none"; 
+						document.getElementById("save_obstacle").style.display="block"; 
 						document.getElementById("pickupTask").style.boxShadow = "none";
 						document.getElementById("lineTask").style.boxShadow = "none";
 						break
@@ -954,6 +1006,21 @@ I (Joram Brenz) just put it together and made it work with the MultiDroneCoordin
 				}
 			}
 
+			function clear_markers() {
+				startposmarker.remove();
+				startposmarker = L.marker([0,0]);
+				startpos = null;
+				latlngs = []; 
+				while (search_markers.length) {
+					marker = search_markers.pop()
+					marker.remove();
+				}
+				while (obstacle_markers.length) {
+					marker = obstacle_markers.pop()
+					marker.remove();
+				}
+			}
+
 			function clear_tasks() {
 				startposmarker.remove();
 				startposmarker = L.marker([0,0]);
@@ -996,6 +1063,17 @@ I (Joram Brenz) just put it together and made it work with the MultiDroneCoordin
 					red_line = red_lines.pop()
 					this.permanent_red_lines.push(red_line)
 				}
+			}
+
+			async function display_error_message(message) {
+				document.getElementById('error_message').innerHTML = message;
+				console.log("1")
+				await sleep(3)
+				document.getElementById('error_message').innerHTML = "";
+			}
+
+			function sleep(s) {
+				return new Promise(resolve => setTimeout(resolve, s*1000));
 			}
 
 			init();

@@ -3,13 +3,7 @@ import time
 import threading
 import dronekit
 
-"""
-Connects and arms all available vehicles based on how many SITL instances is running.
-Each instance needs to be started at forehand using
-sim_vehicle.py -L KSFO -I 0 	// vehicle 1
-sim_vehicle.py -L KSFO -I 1		// vehicle 2
-etc..
-"""
+
 def initialize(vehicles, UAV_BASE_PORT, server):
 
 	# Number of simulated drones available at startup given as a command line argument
@@ -24,7 +18,7 @@ def initialize(vehicles, UAV_BASE_PORT, server):
 
 		# Connect to the Vehicles
 		print('Connecting to vehicle %i on: %s' % (instance_index, connection_string))
-		for _ in range(60):
+		while True:
 			try:
 				vehicle = dronekit.connect(connection_string, wait_ready=True)
 			except Exception as e:
@@ -155,8 +149,12 @@ def distance(location1, location2):
 def is_on_line(drone, location1, location2): 
 	return distance(location1, drone) + distance(location2, drone) == distance(location1, location2)
 
-
 def start_new_simulated_drone(vehicles, UAV_BASE_PORT, server):
+	t = threading.Thread(target=lambda:start_new_simulated_drone_in_new_thread(vehicles, UAV_BASE_PORT, server))
+	t.daemon = True
+	t.start()
+
+def start_new_simulated_drone_in_new_thread(vehicles, UAV_BASE_PORT, server):
 
 		port = UAV_BASE_PORT + 10 * len(vehicles)
 		connection_string = "127.0.0.1:%i" % port #connect to port on localhost
@@ -164,7 +162,8 @@ def start_new_simulated_drone(vehicles, UAV_BASE_PORT, server):
 		# Connect to the Vehicles
 		print('Connecting to vehicle %i on: %s' % (len(vehicles), connection_string))
 		server.send_message_to_all("[\"-1\", \"Connecting to vehicle...\"]")
-		for _ in range(60):
+		
+		while True:
 			try:
 				vehicle = dronekit.connect(connection_string, wait_ready=True)
 			except Exception as e:
@@ -185,3 +184,4 @@ def start_new_simulated_drone(vehicles, UAV_BASE_PORT, server):
 				t.start()
 				break
 				
+
