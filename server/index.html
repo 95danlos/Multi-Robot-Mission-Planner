@@ -286,12 +286,19 @@ I (Joram Brenz) just put it together and made it work with the MultiDroneCoordin
 				font-size: 18px; 
 				opacity: 0.7; 
 			}
-			.clear_tasks {
+			.button_clear_tasks {
 				height: 40px; 
 				width: 100%; 
 				font-size: 18px; 
 				opacity: 0.7; 
 				margin-top: 30px;
+			}
+			.button_delete_mission {
+				height: 40px; 
+				width: 100%; 
+				font-size: 18px; 
+				opacity: 0.7; 
+				color: red;
 			}
 			.hide {
 				display: none; 
@@ -366,6 +373,29 @@ I (Joram Brenz) just put it together and made it work with the MultiDroneCoordin
 				color: red;
 				z-index: 1001;
 			}
+			.pickupTask_weight_text {
+				position:absolute;
+				font-size: 20px;
+				z-index: 1001;
+			}
+			.pickupTask_weight_value {
+				position:absolute;
+				font-size: 20px;
+				top: 45%;
+				height: 50%;
+				width: 100%;
+				z-index: 1001;
+			}
+			.weight_box {
+				position:absolute;
+				top: 14%;
+				left: 78%;
+				height: 70px;
+				width: 100px;
+				z-index: 1001;
+				opacity: 0.7;
+				display: none;
+			}
 		</style>
 
 	</head>
@@ -383,7 +413,13 @@ I (Joram Brenz) just put it together and made it work with the MultiDroneCoordin
 			<input id="saveSearchTask" class="button_task hide" type="button" value="Save Search Task" onclick="saveSearchTask(); "/>
 			<input id="obstacle" class="button_task" type="button" value="Obstacle" onclick="setTask('obstacle'); " />
 			<input id="save_obstacle" class="button_task hide" type="button" value="Save Obstacle" onclick="saveObstacle(); "/>
-			<input id="clear_tasks" class="clear_tasks" type="button" value="Clear Tasks" onclick="clear_tasks();" />
+			<input id="clear_tasks" class="button_clear_tasks" type="button" value="Clear Tasks" onclick="clear_tasks();" />
+			<input id="delete_mission" class="button_delete_mission" type="button" value="Delete Mission" onclick="delete_mission();" />
+		</div>
+
+		<div id="weight_box" class="weight_box">
+			<div id="pickupTask_weight_text" class="pickupTask_weight_text">Weight (kg)</div>
+			<input id="pickupTask_weight_value" class="pickupTask_weight_value" type="input" value="10" />
 		</div>
 
 		<!--
@@ -492,6 +528,7 @@ I (Joram Brenz) just put it together and made it work with the MultiDroneCoordin
 			var startposmarker = L.marker([0,0]);
 			var startpos = null;
 			var lines = [];
+			var pickup_lines = []
 			var polygons = [];
 			var search_task = []; 
 			var search_markers = []; 
@@ -542,6 +579,21 @@ I (Joram Brenz) just put it together and made it work with the MultiDroneCoordin
 					var line = L.polyline([startpos, npos]);
 					line.addTo(mymap);
 					lines.push(line);
+					startpos = null;
+					startposmarker.remove();
+				}
+			}
+			function doPickupTask(npos) {
+				var newpos = npos
+				if (startpos == null) {
+					startposmarker.setLatLng(npos);
+					startposmarker.addTo(mymap);
+					startpos = npos;
+				}
+				else {
+					var line = L.polyline([startpos, npos], {color:'yellow'});
+					line.addTo(mymap);
+					pickup_lines.push(line);
 					startpos = null;
 					startposmarker.remove();
 				}
@@ -703,6 +755,7 @@ I (Joram Brenz) just put it together and made it work with the MultiDroneCoordin
 						document.getElementById("save_obstacle").style.display="none"; 
 						document.getElementById("lineTask").style.boxShadow = "0 1px 5px blue";
 						document.getElementById("pickupTask").style.boxShadow = "none";
+						document.getElementById("weight_box").style.display="none"; 
 						break
 					case "search":
 						document.getElementById("searchTask").style.display="none"; 
@@ -711,6 +764,7 @@ I (Joram Brenz) just put it together and made it work with the MultiDroneCoordin
 						document.getElementById("save_obstacle").style.display="none"; 
 						document.getElementById("lineTask").style.boxShadow = "none";
 						document.getElementById("pickupTask").style.boxShadow = "none";
+						document.getElementById("weight_box").style.display="none"; 
 						break
 					case "pickup":
 						document.getElementById("searchTask").style.display="block"; 
@@ -719,6 +773,7 @@ I (Joram Brenz) just put it together and made it work with the MultiDroneCoordin
 						document.getElementById("save_obstacle").style.display="none"; 
 						document.getElementById("pickupTask").style.boxShadow = "0 1px 5px blue";
 						document.getElementById("lineTask").style.boxShadow = "none";
+						document.getElementById("weight_box").style.display="block"; 
 						break
 					case "none":
 						document.getElementById("searchTask").style.display="block"; 
@@ -727,6 +782,7 @@ I (Joram Brenz) just put it together and made it work with the MultiDroneCoordin
 						document.getElementById("save_obstacle").style.display="none"; 
 						document.getElementById("pickupTask").style.boxShadow = "none";
 						document.getElementById("lineTask").style.boxShadow = "none";
+						document.getElementById("weight_box").style.display="none"; 
 						break
 					case "obstacle":
 						document.getElementById("searchTask").style.display="block"; 
@@ -735,6 +791,7 @@ I (Joram Brenz) just put it together and made it work with the MultiDroneCoordin
 						document.getElementById("save_obstacle").style.display="block"; 
 						document.getElementById("pickupTask").style.boxShadow = "none";
 						document.getElementById("lineTask").style.boxShadow = "none";
+						document.getElementById("weight_box").style.display="none"; 
 						break
 				} 
 				
@@ -1022,17 +1079,9 @@ I (Joram Brenz) just put it together and made it work with the MultiDroneCoordin
 			}
 
 			function clear_tasks() {
-				startposmarker.remove();
-				startposmarker = L.marker([0,0]);
-				startpos = null;
-				latlngs = []; 
 				while (lines.length) {
 					var line = lines.pop();
 					line.remove();
-				}
-				while (search_markers.length) {
-					marker = search_markers.pop()
-					marker.remove();
 				}
 				while (polygons.length) {
 					polygon = polygons.pop()
@@ -1045,6 +1094,7 @@ I (Joram Brenz) just put it together and made it work with the MultiDroneCoordin
 					line = red_lines.pop()
 					line.remove();
 				}
+				clear_markers()
 			}
 
 			function add_permanent_markers() {
@@ -1074,6 +1124,23 @@ I (Joram Brenz) just put it together and made it work with the MultiDroneCoordin
 
 			function sleep(s) {
 				return new Promise(resolve => setTimeout(resolve, s*1000));
+			}
+
+			function delete_mission() {
+				while (permanent_lines.length) {
+					line = permanent_lines.pop()
+					line.remove()
+				}
+				while (permanent_polygons.length) {
+					polygon = permanent_polygons.pop()
+					polygon.remove()
+				}
+				while (permanent_red_lines.length) {
+					line = permanent_lines.pop()
+					line.remove()
+				}
+				ws.send(JSON.stringify([5]));
+				clear_tasks()
 			}
 
 			init();

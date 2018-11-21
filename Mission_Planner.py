@@ -134,7 +134,7 @@ def message_received(client, server, message):
 		""" adding new lines that user draw on map """
 		tasks = ast.literal_eval(message)[1]
 		lines = tasks['line']
-		lines = [[dronekit.LocationGlobal(point["lat"],point["lng"],20) for point in line] for line in lines]
+		lines = [[dronekit.LocationGlobal(point["lat"],point["lng"],10) for point in line] for line in lines]
 		u_tasks.extend(lines)
 
 		#Search task
@@ -145,7 +145,7 @@ def message_received(client, server, message):
 		for task in search_tasks:
 			task_temp = []
 			for point in task:
-				point = dronekit.LocationGlobal(point[0], point[1], 20)
+				point = dronekit.LocationGlobal(point[0], point[1], 10)
 				task_temp.append(point)
 			search_tasks_temp.append(task_temp)
 		search_tasks = search_tasks_temp
@@ -193,6 +193,13 @@ def message_received(client, server, message):
 	if(message_type == 4):
 		Drone_Services.start_new_simulated_drone(vehicles, UAV_BASE_PORT, server)
 
+
+	# Delete mission and stop vehicles
+	if(message_type == 5):
+		for vehicle in vehicles:
+			vehicle.nextlocations = []
+			vehicle.simple_goto(dronekit.LocationGlobal(vehicle.location.global_frame.lat, vehicle.location.global_frame.lon, 10))
+
 		
 	
 def generate_search_coordinates(search_tasks):
@@ -231,15 +238,15 @@ def generate_search_coordinates(search_tasks):
 		else:
 			if moveLatDirection:
 				next_location = current_location
-				next_location = dronekit.LocationGlobal(next_location.lat - 0.0001,next_location.lon,20)
+				next_location = dronekit.LocationGlobal(next_location.lat - 0.0001,next_location.lon,10)
 				moveLatDirection = False
 			else:
 				#If we are max east, move left
 				if current_location.lon >= highest_lon:
-					next_location = dronekit.LocationGlobal(current_location.lat,lowest_lon,20)
+					next_location = dronekit.LocationGlobal(current_location.lat,lowest_lon,10)
 				#Move right
 				else:
-					next_location = dronekit.LocationGlobal(current_location.lat,highest_lon, 20)
+					next_location = dronekit.LocationGlobal(current_location.lat,highest_lon, 10)
 				moveLatDirection = True
 
 		print("Appending " , next_location)
