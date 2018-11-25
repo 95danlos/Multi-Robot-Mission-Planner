@@ -145,6 +145,37 @@ def distance(location1, location2):
 		d = 0.0
 	return d
 
+#Given three colinear points (x1, y1), (x2, y2), (x3, y3), the function checks if 
+#point (x2, y2) lies on line segment (x1,y1)(x3,y3)
+def onSegment(x1, y1, x2, y2, x3, y3):
+	if x2 <= max(x1, x3) and x2 >= min(x1, x3) and y2 <= max(y1, y3) and y2 >= min(y1, y3):
+		return True
+	return False
+
+def orientation(x1, y1, x2, y2, x3, y3):
+	value = (y2 - y1) * (x3 - x2) - (x2 - x1) * (y3 - y2)
+
+	if value == 0:
+		return 0
+	
+	return 1 if value > 0 else 2
+
+def doIntersect(p1, q1, p2, q2):
+	print("Do intersect:",p1)
+	o1 = orientation(p1.lat, p1.lon, q2.lat, q2.lon, p2.lat, p2.lon)
+	o2 = orientation(p1.lat, p1.lon, q1.lat, q1.lon, q2.lat, q2.lon)
+	o3 = orientation(p2.lat, p2.lon, q2.lat, q2.lon, p1.lat, p1.lon)
+	o4 = orientation(p2.lat, p2.lon, q2.lat, q2.lon, q1.lat, q1.lon)
+
+	if o1 != o2 and o3 != o4:
+		return True
+
+	return False
+
+	
+
+
+
 
 def is_on_line(drone, location1, location2): 
 	return distance(location1, drone) + distance(location2, drone) == distance(location1, location2)
