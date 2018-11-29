@@ -45,6 +45,7 @@ $x = $host.UI.RawUI.ReadKey("NoEcho,IncludeKeyDown")
 ```
 
 
+<br /> 
 After the download is complete you need to setup path variable to ardupilot
 
 1. Open and close Cygwin from the desktop to create initialisation files
@@ -55,6 +56,8 @@ After the download is complete you need to setup path variable to ardupilot
 export PATH=$PATH:$HOME/ardupilot/Tools/autotest
 ```
 
+
+<br /> 
 In the Cygwin terminal navigate to the ArduCopter directory and run make.
 
 ```
