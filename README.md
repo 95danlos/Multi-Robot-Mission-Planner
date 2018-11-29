@@ -58,12 +58,16 @@ export PATH=$PATH:$HOME/ardupilot/Tools/autotest
 
 
 <br /> 
-In the Cygwin terminal navigate to the ArduCopter directory and run make.
+Then you need to build the code.
+In a new Cygwin terminal navigate to the ArduCopter directory and run make.
 
 ```
 cd ~/ardupilot/ArduCopter
 make sitl -j4
 ```
+
+
+### How to use
 
 
 
