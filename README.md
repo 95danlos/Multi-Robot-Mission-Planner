@@ -12,7 +12,7 @@ This section describes how to setup the tool on windows. All dependent software 
 Copy the script below to a powershell window to download and install MavProxy, Cygwin, SITL, Ardupilot and Python packages. If the script fails the setup tutorial on the official SITL website needs to be followed instead.
 http://ardupilot.org/dev/docs/sitl-native-on-windows.html 
 
-'''
+`
 Import-Module BitsTransfer
 
 Write-Output "Starting Downloads"
@@ -42,7 +42,7 @@ Write-Host "Finished. Press any key to continue ..."
 $x = $host.UI.RawUI.ReadKey("NoEcho,IncludeKeyDown")
 
 
-'''
+`
 
 After the download is complete you need to setup path variable to ardupilot
 
@@ -50,16 +50,16 @@ After the download is complete you need to setup path variable to ardupilot
 2. Navigate to the .bashrc file on your computer (e.g. C:\cygwin\home\user_name\.bashrc
 3. Add the following line to the end of .bashrc
 
-'''
+`
 export PATH=$PATH:$HOME/ardupilot/Tools/autotest
-'''
+`
 
 In the Cygwin terminal navigate to the ArduCopter directory and run make.
 
-'''
+`
 cd ~/ardupilot/ArduCopter
 make sitl -j4
-'''
+`
 
 
 
