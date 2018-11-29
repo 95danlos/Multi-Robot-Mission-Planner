@@ -6,6 +6,8 @@ In this project we have created a custom mission planner / ground control statio
 Ardupilot is the autopilot software used for controlling the robots, and needs to be running on all the robots if using real robots. For simulation we use SITL(Software In The Loop) which is a simulation tool for Ardupilot and is used to simulate different vehicles.
 
 
+<br /> 
+<br /> 
 ### Setup
 This section describes how to setup the tool on windows. All dependent software should be compatible with linux and os x, but will require different installation steps.
 
@@ -67,6 +69,8 @@ make sitl -j4
 ```
 
 
+<br /> 
+<br /> 
 ### How to use
 
 
