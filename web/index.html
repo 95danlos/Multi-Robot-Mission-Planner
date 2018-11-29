@@ -12,6 +12,8 @@ I (Joram Brenz) just put it together and made it work with the MultiDroneCoordin
 		<title>Mission Planner</title>
 
 		<meta charset="utf-8" />
+
+		<link href="style.css" rel="stylesheet" type="text/css">
 		
 		<!-- include stylesheet for leaflet -->
 		<link rel="stylesheet" href="https://unpkg.com/leaflet@1.3.4/dist/leaflet.css"
@@ -22,351 +24,6 @@ I (Joram Brenz) just put it together and made it work with the MultiDroneCoordin
 		<script src="https://unpkg.com/leaflet@1.3.4/dist/leaflet.js"
 			integrity="sha512-nMMmRyTVoLYqjP9hrbed9S+FzjZHW5gY1TWCHA5ckwXZBadntCNs8kEqAWdrb9O7rxbCaA4lKTIWjDXZxflOcA=="
 			crossorigin=""></script>
-
-		<style>
-			html{
-				min-height:100%;/* make sure it is at least as tall as the viewport */
-				position:relative;
-			}
-			body{
-				height:100%; /* force the BODY element to match the height of the HTML element */
-			}
-			#mapid{
-				position:absolute;
-				top:0;
-				bottom:0;
-				left:0;
-				right:0;
-				overflow:hidden;
-				z-index:0;
-			}
-
-			.flight_data{
-				position:absolute;
-				bottom:5px;
-				left:5px;
-				z-index:1000;
-				height: 400px;
-				width: 350px;
-				border: 2px solid black;
-			}
-			.next_vehicle_button{
-				position:absolute;
-				top:0px;
-				left:230px;
-				height: 50px;
-				width: 120px;
-				z-index:1000;
-				font-size: 15px;
-				opacity: 0.7;
-			}
-			.prev_vehicle_button{
-				position:absolute;
-				top:0px;
-				left:0px;
-				height: 50px;
-				width: 120px;
-				z-index:1000;
-				font-size: 15px;
-				opacity: 0.7;
-			}
-			.current_vehicle_text{
-				position:absolute;
-				text-align: center;
-				top:0px;
-				left:120px;
-				height: 50px;
-				width: 110px;
-				z-index:1000;
-				font-size: 40px;
-				color:white;
-				background-color: black;
-				opacity: 0.7;
-			}
-			.flight_data_button{
-				position:absolute;
-				top:50px;
-				left:0px;
-				height: 30px;
-				width: 175px;
-				z-index:1000;
-				font-size: 15px;
-				opacity: 0.7;
-				box-shadow: 0 1px 5px blue;
-			}
-			.parameter_button{
-				position:absolute;
-				top:50px;
-				left:175px;
-				height: 30px;
-				width: 175px;
-				z-index:1000;
-				font-size: 15px;
-				opacity: 0.7;
-			}
-			.flight_data_tab{
-				position:absolute;
-				top:80px;
-				left:0px;
-				height: 320px;
-				width: 350px;
-				z-index:1000;
-				font-size: 15px;
-				opacity: 0.7;
-			}
-			.altitude_text{
-				position:absolute;
-				top:20px;
-				left:40px;
-				z-index:1000;
-				font-size: 25px;
-				color: blue;
-			}
-			.speed_text{
-				position:absolute;
-				top:20px;
-				left:210px;
-				z-index:1000;
-				font-size: 25px;
-				color: orange;
-			}
-			.heading_text{
-				position:absolute;
-				top:120px;
-				left:40px;
-				z-index:1000;
-				font-size: 25px;
-				color: green;
-			}
-			.battery_text{
-				position:absolute;
-				top:120px;
-				left:210px;
-				z-index:1000;
-				font-size: 25px;
-				color: purple;
-			}
-			.altitude_value{
-				position:absolute;
-				top:50px;
-				left:40px;
-				z-index:1000;
-				font-size: 40px;
-				color: blue;
-			}
-			.speed_value{
-				position:absolute;
-				top:50px;
-				left:210px;
-				z-index:1000;
-				font-size: 40px;
-				color: orange;
-			}
-			.heading_value{
-				position:absolute;
-				top:150px;
-				left:40px;
-				z-index:1000;
-				font-size: 40px;
-				color: green;
-			}
-			.battery_value{
-				position:absolute;
-				top:150px;
-				left:210px;
-				z-index:1000;
-				font-size: 40px;
-				color: purple;
-			}
-			.reacharge_battery_button{
-				position:absolute;
-				bottom:20px;
-				left:20px;
-				height: 30px;
-				width: 150px;
-				z-index:1001;
-				font-size: 15px;
-				opacity: 0.7;
-			}
-			.parameter_tab{
-				position:absolute;
-				top:80px;
-				left:0px;
-				height: 320px;
-				width: 350px;
-				z-index:1000;
-				font-size: 15px;
-				opacity: 0.7;
-				display: none
-			}
-			.parameter{
-				position: relative;
-				height: 80px;
-				width: 350px;
-				z-index:1000;
-				font-size: 15px;
-				border-bottom: 1px solid black;
-			}
-			.speed_parameter_text{
-				position:absolute;
-				top:12px;
-				left:10px;
-				z-index:1000;
-				font-size: 20px;
-				font-weight: bold;
-			}
-			.speed_parameter_value{
-				position:absolute;
-				top:45px;
-				left:10px;
-				z-index:1000;
-				font-size: 20px;
-			}
-			.speed_parameter_change_button{
-				position:absolute;
-				top:35px;
-				left:250px;
-				height: 35px;
-				width: 80px;
-				z-index:1000;
-				font-size: 15px;
-				opacity: 0.8;
-			}
-			.speed_parameter_change_button_confirm{
-				position:absolute;
-				top:35px;
-				left:250px;
-				height: 35px;
-				width: 80px;
-				z-index:1000;
-				font-size: 15px;
-				opacity: 0.8;
-				display: none
-			}
-			.speed_parameter_change_button_cancel{
-				position:absolute;
-				top:35px;
-				left:150px;
-				height: 35px;
-				width: 80px;
-				z-index:1000;
-				font-size: 15px;
-				opacity: 0.8;
-				display: none
-			}
-			.speed_parameter_change_input{
-				position:absolute;
-				top:40px;
-				left:10px;
-				height: 20px;
-				width: 100px;
-				z-index:1000;
-				font-size: 15px;
-				opacity: 0.7;
-				display: none
-			}
-			.buttonBox_fly{
-				position:absolute;
-				top:20px;
-				right:20px;
-				z-index:1000;
-				height: 300px;
-				width: 150px;
-			}
-			.button_fly{
-				height: 60px;
-				width: 100%;
-				font-size: 20px;
-				opacity: 0.7;
-				margin-bottom: 20px;
-			}
-			.button_task {
-				height: 40px; 
-				width: 100%; 
-				font-size: 18px; 
-				opacity: 0.7; 
-			}
-			.clear_tasks {
-				height: 40px; 
-				width: 100%; 
-				font-size: 18px; 
-				opacity: 0.7; 
-				margin-top: 30px;
-			}
-			.hide {
-				display: none; 
-				font-size: 1.0em; 
-			}
-			.add_drone_box {
-				position: absolute;
-				z-index:1000;
-				bottom: 420px;
-				left: 20px;
-				height: 100px; 
-				width: 300px; 
-				opacity: 0.7; 
-			}
-			.add_drone_button {
-				position: absolute;
-				z-index:1001;
-				top: 50px;
-				left: 0px;
-				height: 40px; 
-				width: 80px; 
-			}
-			.add_new_drone_command {
-				position: absolute;
-				top: 50px;
-				left: 0px;
-				height: 30px; 
-				width: 300px;
-				display: none;
-			}
-			.copy_to_clipboard {
-				position: absolute;
-				top: 50px;
-				left: 300px;
-				height: 37px; 
-				width: 70px; 
-				display: none;
-			}
-			.add_new_drone_connect_button {
-				position: absolute;
-				z-index:1001;
-				top: 0px;
-				left: 0px;
-				height: 40px; 
-				width: 80px;
-				display: none;
-			}
-			.add_new_drone_cancel_button {
-				position: absolute;
-				z-index:1001;
-				top: 0px;
-				left: 100px;
-				height: 40px; 
-				width: 80px;
-				display: none;
-			}
-			.new_drone_status {
-				position: absolute;
-				top: 70px;
-				left: 0px;
-				height: 40px; 
-				width: 300px;
-				font-size: 20px;
-			}
-			.error_message {
-				position: absolute;
-				text-align: center;
-				top: 30%;
-				left: 30%;
-				width: 40%;
-				font-size: 40px;
-				color: red;
-				z-index: 1001;
-			}
-		</style>
 
 	</head>
 
@@ -383,7 +40,13 @@ I (Joram Brenz) just put it together and made it work with the MultiDroneCoordin
 			<input id="saveSearchTask" class="button_task hide" type="button" value="Save Search Task" onclick="saveSearchTask(); "/>
 			<input id="obstacle" class="button_task" type="button" value="Obstacle" onclick="setTask('obstacle'); " />
 			<input id="save_obstacle" class="button_task hide" type="button" value="Save Obstacle" onclick="saveObstacle(); "/>
-			<input id="clear_tasks" class="clear_tasks" type="button" value="Clear Tasks" onclick="clear_tasks();" />
+			<input id="clear_tasks" class="button_clear_tasks" type="button" value="Clear Tasks" onclick="clear_tasks();" />
+			<input id="delete_mission" class="button_delete_mission" type="button" value="Delete Mission" onclick="delete_mission();" />
+		</div>
+
+		<div id="weight_box" class="weight_box">
+			<div id="pickupTask_weight_text" class="pickupTask_weight_text">Weight (kg)</div>
+			<input id="pickupTask_weight_value" class="pickupTask_weight_value" type="input" value="10" />
 		</div>
 
 		<!--
@@ -407,7 +70,6 @@ I (Joram Brenz) just put it together and made it work with the MultiDroneCoordin
 			<div id="current_vehicle_text" class="current_vehicle_text">1</div>
 			<input id="flight_data_button" class="flight_data_button" type="button" value="Flight Data" onclick="show_flight_data_tab();" />
 			<input id="parameter_button" class="parameter_button" type="button" value="Parameters" onclick="show_parameter_tab();" />
-			<input id="reacharge_battery_button" class="reacharge_battery_button" type="button" value="Reacharge Battery" onclick="reacharge_battery();" />
 			
 			<div id="flight_data_tab" class="flight_data_tab">
 				<div id="altitude_text" class="altitude_text">Altitude (m)</div>
@@ -418,6 +80,7 @@ I (Joram Brenz) just put it together and made it work with the MultiDroneCoordin
 				<div id="heading_value" class="heading_value">0</div>
 				<div id="battery_text" class="battery_text">Battery (min)</div>
 				<div id="battery_value" class="battery_value">0</div>
+				<input id="reacharge_battery_button" class="reacharge_battery_button" type="button" value="Reacharge Battery" onclick="reacharge_battery();" />
 			</div>
 			<div id="parameter_tab" class="parameter_tab">
 				<div id="parameter_1" class="parameter">
@@ -476,11 +139,11 @@ I (Joram Brenz) just put it together and made it work with the MultiDroneCoordin
 
 			// create custom icon
 			var drone_icon = L.icon({
-				iconUrl: 'https://ubisafe.org/images/drone-drawing-clipart-5.png',
+				iconUrl: 'http://cdn.onlinewebfonts.com/svg/img_476254.png',
 				iconSize: [30, 30],
 			});
 			var drone_icon_big = L.icon({
-				iconUrl: 'https://ubisafe.org/images/drone-drawing-clipart-5.png',
+				iconUrl: 'http://cdn.onlinewebfonts.com/svg/img_476254.png',
 				iconSize: [50, 50],
 			});	
 				var drone_icon_dead = L.icon({
@@ -491,19 +154,23 @@ I (Joram Brenz) just put it together and made it work with the MultiDroneCoordin
 						
 			var startposmarker = L.marker([0,0]);
 			var startpos = null;
-			var lines = [];
+			var line_tasks = [];
+			var line_tasks_map = [];
+			var pickup_tasks = []
+			var pickup_tasks_map = []
 			var polygons = [];
 			var search_task = []; 
 			var search_markers = []; 
 			var obstacles = []; 
+			var obstacle_polygons = [];
 			var obstacle_markers = []; 
-			var red_lines = [];
 			var prevPos = null; 
 			var latlngs = []; 
 
-			var permanent_lines = []
+			var permanent_line_tasks = []
+			var permanent_pickup_tasks = []
 			var permanent_polygons = []
-			var permanent_red_lines = []
+			var permanent_obstacles = []
 
 			this.battery_data = {}
 			//This is the array that will be sent to the server. It will contain all the different tasks, each index corresponding to a specific task
@@ -541,7 +208,29 @@ I (Joram Brenz) just put it together and made it work with the MultiDroneCoordin
 				else {
 					var line = L.polyline([startpos, npos]);
 					line.addTo(mymap);
-					lines.push(line);
+					line_tasks_map.push(line);
+					line_tasks.push(line.getLatLngs())
+					startpos = null;
+					startposmarker.remove();
+				}
+			}
+			function doPickupTask(npos) {
+				var newpos = npos
+				if (startpos == null) {
+					startposmarker.setLatLng(npos);
+					startposmarker.addTo(mymap);
+					startpos = npos;
+				}
+				else {
+					var line = L.polyline([startpos, npos], {color:'purple'});
+					var weight = document.getElementById("pickupTask_weight_value").value;
+					line.addTo(mymap).bindTooltip(weight, { permanent: true, interactive: true });
+
+					pickup_tasks_map.push(line);
+					pickup_tasks.push({
+						"weight": weight,
+						"line" : line.getLatLngs()
+					});
 					startpos = null;
 					startposmarker.remove();
 				}
@@ -560,7 +249,6 @@ I (Joram Brenz) just put it together and made it work with the MultiDroneCoordin
 			}
 			function saveSearchTask() {
 				if(latlngs.length > 3) {
-					red_lines.push(L.polyline(latlngs, {color: 'red'}).addTo(mymap))
 					rectangle = createRectangle();
 					polygons.push(L.polygon(rectangle, {color: "purple"}).addTo(mymap))		
 					search_task.push(rectangle)
@@ -573,10 +261,10 @@ I (Joram Brenz) just put it together and made it work with the MultiDroneCoordin
 			}
 			function saveObstacle() {
 				if(latlngs.length > 3) {
-					//red_lines.push(L.polyline(latlngs, {color: 'red'}).addTo(mymap))
 					obstacle = createRectangle();
+					obstacle_polygons.push(L.polygon(obstacle, {color: "red"}).addTo(mymap))	
 					obstacles.push(obstacle)		
-					//clear_markers()
+					clear_markers()
 					setTask("none")
 				}
 				else {
@@ -641,7 +329,7 @@ I (Joram Brenz) just put it together and made it work with the MultiDroneCoordin
 	
 				// Set event handlers.
 				ws.onopen = function() {
-					console.log("onopen");
+					console.log("Server Online");
 				};
 				
 				ws.onmessage = function(e) {
@@ -663,38 +351,30 @@ I (Joram Brenz) just put it together and made it work with the MultiDroneCoordin
 				}.bind(this);
 				
 				ws.onclose = function() {
-					console.log("onclose");
+					console.log("Server Closed");
 					alert("server disconnected - you may as well close this tab");
 				};
 	
 				ws.onerror = function(e) {
-					console.log("onerror");
+					console.log("Server Error");
 					console.log(e);
 					alert(e);
 				};
 			}
 			function fly() {
-				var linetasks = [];
-				for (i=0; i < lines.length; i++) {
-					linetasks.push(lines[i].getLatLngs());
-				}
 				//Index 0 = Line Tasks
-				tasks['line'] = linetasks; 
+				tasks['line'] = line_tasks; 
 				//Index 1 = Search Tasks
 				tasks['search'] = search_task;
 				//Index 2 = obstacles
 				tasks['obstacles'] = obstacles;
-			
-				console.log(obstacles)
-				console.log(search_task)
+				//Index 3 = pickup Tasks
+				tasks['pickup'] = pickup_tasks;
 
-				console.log("JSON: " + tasks)
+				console.log("JSON: " + JSON.stringify(tasks))
 				ws.send(JSON.stringify([0, tasks]));
-
-				//Clear search_task
-				search_task = []
-
 				add_permanent_markers()
+				clear_tasks()
 			}
 
 			function setTask(task) {
@@ -709,6 +389,7 @@ I (Joram Brenz) just put it together and made it work with the MultiDroneCoordin
 						document.getElementById("save_obstacle").style.display="none"; 
 						document.getElementById("lineTask").style.boxShadow = "0 1px 5px blue";
 						document.getElementById("pickupTask").style.boxShadow = "none";
+						document.getElementById("weight_box").style.display="none"; 
 						break
 					case "search":
 						document.getElementById("searchTask").style.display="none"; 
@@ -717,6 +398,7 @@ I (Joram Brenz) just put it together and made it work with the MultiDroneCoordin
 						document.getElementById("save_obstacle").style.display="none"; 
 						document.getElementById("lineTask").style.boxShadow = "none";
 						document.getElementById("pickupTask").style.boxShadow = "none";
+						document.getElementById("weight_box").style.display="none"; 
 						break
 					case "pickup":
 						document.getElementById("searchTask").style.display="block"; 
@@ -725,6 +407,7 @@ I (Joram Brenz) just put it together and made it work with the MultiDroneCoordin
 						document.getElementById("save_obstacle").style.display="none"; 
 						document.getElementById("pickupTask").style.boxShadow = "0 1px 5px blue";
 						document.getElementById("lineTask").style.boxShadow = "none";
+						document.getElementById("weight_box").style.display="block"; 
 						break
 					case "none":
 						document.getElementById("searchTask").style.display="block"; 
@@ -733,6 +416,7 @@ I (Joram Brenz) just put it together and made it work with the MultiDroneCoordin
 						document.getElementById("save_obstacle").style.display="none"; 
 						document.getElementById("pickupTask").style.boxShadow = "none";
 						document.getElementById("lineTask").style.boxShadow = "none";
+						document.getElementById("weight_box").style.display="none"; 
 						break
 					case "obstacle":
 						document.getElementById("searchTask").style.display="block"; 
@@ -741,6 +425,7 @@ I (Joram Brenz) just put it together and made it work with the MultiDroneCoordin
 						document.getElementById("save_obstacle").style.display="block"; 
 						document.getElementById("pickupTask").style.boxShadow = "none";
 						document.getElementById("lineTask").style.boxShadow = "none";
+						document.getElementById("weight_box").style.display="none"; 
 						break
 				} 
 				
@@ -750,7 +435,6 @@ I (Joram Brenz) just put it together and made it work with the MultiDroneCoordin
 					var position = data[1];
 					// If new drone, add marker
 					if (!drone_markers_and_traces.has(id)) {
-						//var new_drone_marker = L.marker(position,{color:'red',radius:"10", icon: firefoxIcon}).bindTooltip("Vehicle "+(id+1)).addTo(mymap);
 						var new_drone_marker = L.marker(position,{icon: drone_icon}).bindTooltip("Vehicle "+(id+1)).addTo(mymap);
 						var new_drone_trace = L.polyline([position],{color:'green'}).addTo(mymap);
 						drone_markers_and_traces.set(id, [new_drone_marker, new_drone_trace]);
@@ -821,8 +505,6 @@ I (Joram Brenz) just put it together and made it work with the MultiDroneCoordin
 				else {
 					drone_marker_and_trace[0].setIcon(drone_icon_big);
 				}
-				//drone_marker_and_trace[0].setRadius(15);
-				//drone_marker_and_trace[0].setStyle({color:'green'});
 			}
 			
 			function remove_highlight_from_vehicle(id) {
@@ -833,8 +515,6 @@ I (Joram Brenz) just put it together and made it work with the MultiDroneCoordin
 				else {
 					drone_marker_and_trace[0].setIcon(drone_icon);
 				}
-				//drone_marker_and_trace[0].setRadius(15);
-				//drone_marker_and_trace[0].setStyle({color:'green'});
 			}
 
 			function fix_buttons() {
@@ -1008,6 +688,7 @@ I (Joram Brenz) just put it together and made it work with the MultiDroneCoordin
 					document.getElementById("new_drone_status").style.display = "none";
 				}
 				else {
+					document.getElementById('add_drone_button').style.display = "none";
 					document.getElementById("new_drone_status").innerHTML = data[1];
 				}
 			}
@@ -1028,52 +709,75 @@ I (Joram Brenz) just put it together and made it work with the MultiDroneCoordin
 			}
 
 			function clear_tasks() {
-				startposmarker.remove();
-				startposmarker = L.marker([0,0]);
-				startpos = null;
-				latlngs = []; 
-				while (lines.length) {
-					var line = lines.pop();
+				while (line_tasks_map.length) {
+					var line = line_tasks_map.pop();
 					line.remove();
 				}
-				while (search_markers.length) {
-					marker = search_markers.pop()
-					marker.remove();
+				while (pickup_tasks_map.length) {
+					var line = pickup_tasks_map.pop();
+					line.remove();
 				}
 				while (polygons.length) {
 					polygon = polygons.pop()
 					polygon.remove(); 
 				}
-				while (search_task.length) {
-					task = search_task.pop()
+				while (obstacle_polygons.length) {
+					obstacle = obstacle_polygons.pop()
+					obstacle.remove(); 
 				}
-				while (red_lines.length) {
-					line = red_lines.pop()
-					line.remove();
-				}
+				clear_markers()
+				line_tasks = []
+				pickup_tasks = []
+				search_task = []
+				obstacles = []
 			}
 
 			function add_permanent_markers() {
-				while (lines.length) {
-					var line = lines.pop();
+				while (line_tasks_map.length) {
+					var line = line_tasks_map.pop();
 					line.setStyle({color:'orange'});
-					this.permanent_lines.push(line)
+					this.permanent_line_tasks.push(line)
 				}
-				
+				while (pickup_tasks_map.length) {
+					var line = pickup_tasks_map.pop();
+					line.setStyle({color:'orange'});
+					this.permanent_pickup_tasks.push(line)
+				}
 				while (polygons.length) {
 					polygon = polygons.pop()
 					polygon.setStyle({color:'orange'});
 					this.permanent_polygons.push(polygon)
 				}
-				while (red_lines.length) {
-					red_line = red_lines.pop()
-					this.permanent_red_lines.push(red_line)
+				while (obstacle_polygons.length) {
+					obstacle = obstacle_polygons.pop()
+					obstacle.setStyle({color:'red'});
+					this.permanent_obstacles.push(obstacle)
 				}
+			}
+
+			function delete_mission() {
+				while (permanent_line_tasks.length) {
+					line = permanent_line_tasks.pop()
+					line.remove()
+				}
+				while (permanent_pickup_tasks.length) {
+					line = permanent_pickup_tasks.pop()
+					line.remove()
+				}
+				while (permanent_polygons.length) {
+					polygon = permanent_polygons.pop()
+					polygon.remove()
+				}
+				while (permanent_obstacles.length) {
+					obstacle = permanent_obstacles.pop()
+					obstacle.remove()
+				}
+				ws.send(JSON.stringify([5]));
+				clear_tasks()
 			}
 
 			async function display_error_message(message) {
 				document.getElementById('error_message').innerHTML = message;
-				console.log("1")
 				await sleep(3)
 				document.getElementById('error_message').innerHTML = "";
 			}

@@ -2,16 +2,11 @@ import os, sys, inspect, ast, time, threading
 import http.server, webbrowser
 from .websocket_server import WebsocketServer
 
-
-PATH = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
-
-print("serving page from",PATH)
-os.chdir(PATH)
+os.chdir("web")
 
 
 class CombiServer(WebsocketServer):
 	def __init__(self, http_port, websocket_port):
-		print(PATH)
 		super(CombiServer, self).__init__(websocket_port)
 		self.websocket_thread = threading.Thread(target=self.run_forever)
 		

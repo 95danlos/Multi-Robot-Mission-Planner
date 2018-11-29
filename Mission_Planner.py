@@ -20,7 +20,6 @@ u_tasks = []
 
 def main():
 	Drone_Services.initialize(vehicles, UAV_BASE_PORT, server)
-	Drone_Services.start_data_updating(vehicles, server)
 	server.set_fn_message_received(message_received)
 
 
@@ -32,7 +31,7 @@ def main():
 
 			# For each vehicle
 			for vehicle in vehicles:
-				# If the vehicle does not have a next task, add it to free vehicles'
+				# If the vehicle does not have a next task, add it to free vehicles
 				if not vehicle.nextlocations:
 					free_vehicles.append(vehicle)
 				# Else if next task is reached remove it from the vehicles's task lis
@@ -50,160 +49,106 @@ def main():
 
 			# Distribute new tasks	
 			distribute_tasks(free_vehicles)
-			#distribute_search_task(free_vehicles)
 			time.sleep(1)
 
+
+"""
+	Distribute tasks while there are more undone tasks and free vehicles
+"""
 def distribute_tasks(free_vehicles):
 
-	while free_vehicles and is_more_tasks():
+	while free_vehicles and u_tasks:
 		task, vehicle = best_vehicle_task(free_vehicles)
-		if (task == None) or vehicle == None:
-			raise RuntimeError("Error in task distribution: There should always be an optimal task")
 		
-		free_vehicles.remove(vehicle)
+		if (task is not None and vehicle is not None):
+			
+			free_vehicles.remove(vehicle)
+			u_tasks.remove(task) 
 
-		u_tasks.remove(task) 
+			vehicle.nextlocations.extend(task)
+			vehicle.simple_goto(vehicle.nextlocations[0])
+		
+		# If task is None, no more vehicles can do any of the remaining tasks
+		else:
+			break
 
 
-		vehicle.nextlocations.extend(task)
-		vehicle.simple_goto(vehicle.nextlocations[0])
-
+"""
+	Try to find the shortest distance between a task and vehicle, not optimized
+"""
 def best_vehicle_task(free_vehicles):
 
 	best_vehicle = None
 	best_task = None
 	best_distance = None
+	path = []
 	for vehicle in free_vehicles:
-		print("Free ve")
 		for task in u_tasks:
-			print("IN TASK!!!!!!!!!!!!!!!!!!!!!!!")
-			#The first point in the task is the starting point
-			point = task[0]
 
+			# If this is a pickup task, check that the vehicle is able to carry the weight
+			if (len(task) < 4 or task[3] != "weight" or (task[3] == "weight" and vehicle.max_carry_weight >= float(task[2]))):
 
-			#FINAL DESIGN LETSGO
-			distance, path = calculate_distance_path(task, vehicle.location.global_frame)
-			print("Path:", path)
-			print(distance)
-			if (best_distance == None) or (distance < best_distance):
-				best_vehicle = vehicle
-				best_task = task
-				best_distance = distance
+				distance, new_path = Drone_Services.calculate_distance_path(task, vehicle.location.global_frame, obstacles)
+				if (best_distance == None) or (distance < best_distance):
+					best_vehicle = vehicle
+					best_task = task
+					best_distance = distance
+					path = new_path
 	
-	if path:
+	if (best_task is not None):
+
+		# If this is a pickup task remove the parameters before appending task
+		if (len(best_task) > 3 and best_task[3] == "weight"):
+			best_task.pop()
+			best_task.pop()
+		
 		best_vehicle.nextlocations.extend(path)
+	
 	return best_task, best_vehicle
 
 
-def calculate_distance_path(task, location):
-	print("CALCULATING!!!!!!!!")
-	current_location = location
-	obstacle = is_obstacle(current_location, task)
-
-	if obstacle == None:
-		return Drone_Services.distance(current_location, task[0])
-	else:
-		return calculate_obstacle_distance(current_location, task, obstacle)
 
 
-def is_obstacle(p, task):
-	print("In is obstacle")
-	i = 0
-	for obstacle in obstacles:
-		print("Inside loop obstacle:", obstacle)
-		print("Obstacle 0:", obstacle[0])
-		line1 = Drone_Services.doIntersect(obstacle[0], obstacle[1], p, task[0])
-		line2 = Drone_Services.doIntersect(obstacle[1], obstacle[2], p, task[0])
-		line3 = Drone_Services.doIntersect(obstacle[2], obstacle[3], p, task[0])
-		line4 = Drone_Services.doIntersect(obstacle[3], obstacle[0], p, task[0])
-
-		if line1 or line2 or line3 or line4:
-			print(i)
-			return obstacle
-		i=i+1
-	return None
-
-def calculate_obstacle_distance(location, task, obstacle):
-	counter = 0
-	distance = 0
-	corner = 0
-	path = []
-	closest_corner_distance = Drone_Services.distance(location, obstacle[0])
-	closest_corner = obstacle[0]
-
-	for point in obstacle:
-		if Drone_Services.distance(point, location) < closest_corner_distance:
-			closest_corner = point
-			corner = counter
-		counter+=1
-
-	offset = makeOffset(closest_corner, corner)
-	path.append(offset)
-	distance = Drone_Services.distance(location, offset)
-
-	#If there is another obstacle from the first obstacle corner to the task then we need to go to another corner and then we are safe.. we assume atleast
-	if is_obstacle(offset, task) == None:
-		path.extend(task)
-		distance = distance +  Drone_Services.distance(offset,task[0])
-	else: 
-		corner = (corner+1) % 4
-		if is_obstacle(makeOffset(obstacle[corner], corner), task) == None:
-			path.append(makeOffset(obstacle[corner], corner))
-
-			#:))
-			distance = distance + Drone_Services.distance(makeOffset(obstacle[corner], corner),task[0]) + Drone_Services.distance(offset,makeOffset(obstacle[corner], corner))
 
 
-	return distance, path
 
-def makeOffset(p, corner):
-	if corner == 0:
-		return dronekit.LocationGlobal(p.lat+0.0001, p.lon-0.0001, altitude)
-	if corner == 1:
-		return dronekit.LocationGlobal(p.lat+0.0001, p.lon+0.0001, altitude)
-	if corner == 2:
-		return dronekit.LocationGlobal(p.lat-0.0001, p.lon+0.0001, altitude)
-	if corner == 3:
-		return dronekit.LocationGlobal(p.lat-0.0001, p.lon-0.0001, altitude)
-
-
-def is_more_tasks():
-	return len(u_tasks) > 0
-
-# Called when a client clicks on fly button
+# Called when a client clicks on the fly button
 def message_received(client, server, message):
-
 
 	# First position indicates message type
 	message_type = ast.literal_eval(message)[0]
 
+	# Adding new tasks that user draw on map
 	if(message_type == 0):
-
-		""" adding new lines that user draw on map """
+		
+		# Line task
 		tasks = ast.literal_eval(message)[1]
 		lines = tasks['line']
 		lines = [[dronekit.LocationGlobal(point["lat"],point["lng"],altitude) for point in line] for line in lines]
+		
+		global u_tasks
 		u_tasks.extend(lines)
 
-		#Search task
+
+		# Pickup task
+		pickup_tasks_temp = []
+		for pickup_task in tasks['pickup']:
+			line = pickup_task["line"]
+			weight = pickup_task["weight"]
+			line = [
+				dronekit.LocationGlobal(line[0]["lat"], line[0]["lng"], altitude),
+				dronekit.LocationGlobal(line[1]["lat"], line[1]["lng"], altitude),
+				weight,
+				"weight"
+			]
+			pickup_tasks_temp.append(line)
+
+		u_tasks.extend(pickup_tasks_temp)
+			
+
+		# Search task
 		search_tasks = tasks['search']
 		search_tasks_temp = []
-
-
-		#Obstacles 
-		obstacles_from_client = tasks['obstacles']
-		obstacles_temp = []
-
-
-
-		for obstacle in obstacles_from_client:
-			point_temp = []
-			for point in obstacle:
-				point = dronekit.LocationGlobal(point[0], point[1], altitude)
-				point_temp.append(point)
-			obstacles_temp.append(point_temp)
-
-		obstacles.extend(obstacles_temp)
 
 		#Convert to DroneKit's Global Position Object
 		for task in search_tasks:
@@ -215,8 +160,23 @@ def message_received(client, server, message):
 		search_tasks = search_tasks_temp
 
 		if len(search_tasks) > 0:
-			search_tasks = generate_search_coordinates(search_tasks)
+			search_tasks = Drone_Services.generate_search_coordinates(search_tasks)
 			u_tasks.append(search_tasks)
+
+
+		# Obstacles 
+		obstacles_from_client = tasks['obstacles']
+		obstacles_temp = []
+
+		for obstacle in obstacles_from_client:
+			point_temp = []
+			for point in obstacle:
+				point = dronekit.LocationGlobal(point[0], point[1], altitude)
+				point_temp.append(point)
+			obstacles_temp.append(point_temp)
+
+		global obstacles
+		obstacles.extend(obstacles_temp)
 
 	
 	# New Parameter recieved
@@ -262,58 +222,10 @@ def message_received(client, server, message):
 	if(message_type == 5):
 		for vehicle in vehicles:
 			vehicle.nextlocations = []
+			free_vehicles = []
+			obstacles = []
+			u_tasks = []
 			vehicle.simple_goto(dronekit.LocationGlobal(vehicle.location.global_frame.lat, vehicle.location.global_frame.lon, altitude))
-
-		
 	
-def generate_search_coordinates(search_tasks):
 
-	points = search_tasks[0]
-
-	'''
-	Indexes of "points":
-	0 = North West, 1 = North East, 2 = South East, 3 = South West
-	0---------------1
-	|				|
-	|				|
-	|				|
-	3---------------2
-	'''
-	#This is the North West corner of the search area
-	starting_point = points[0]
-	#How far south the drone shall search
-	lowest_lat = points[3].lat
-	#How far west the drone shall go 
-	lowest_lon = points[0].lon
-	#How far east the drone shall go
-	highest_lon = points[1].lon
-
-	paths = []
-
-	current_location = starting_point
-	next_location = None
-	moveLatDirection = False
-
-	while current_location.lat > lowest_lat:
-		if next_location == None:
-			#Start in northwest corner
-			next_location = starting_point
-		else:
-			if moveLatDirection:
-				next_location = current_location
-				next_location = dronekit.LocationGlobal(next_location.lat - 0.0001,next_location.lon,10)
-				moveLatDirection = False
-			else:
-				#If we are max east, move left
-				if current_location.lon >= highest_lon:
-					next_location = dronekit.LocationGlobal(current_location.lat,lowest_lon,10)
-				#Move right
-				else:
-					next_location = dronekit.LocationGlobal(current_location.lat,highest_lon, 10)
-				moveLatDirection = True
-
-		paths.append(next_location)
-		current_location = next_location
-	
-	return paths
 main()
