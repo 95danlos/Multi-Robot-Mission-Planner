@@ -88,16 +88,17 @@ To add a new simulated vehicle click the add drone button, then the copy button 
 
 Alternatively you can startup the vehicles manually by navigating to ArduCopter in Cygwin and start the simulation.
 
-
+```
 Cygwin terminal 1
 cd ~/ardupilot/ArduCopter  
 sim_vehicle.py -L KSFO -I 0
+```
 
-
+```
 Cygwin terminal 2
 cd ~/ardupilot/ArduCopter  
 sim_vehicle.py -L KSFO -I 1
-
+```
 
 <br /> 
 
