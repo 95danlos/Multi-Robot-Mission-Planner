@@ -72,13 +72,13 @@ make sitl -j4
 
 <br /> 
 
-## How to use
+### How to use
 This section describes how to use the mission planner.
 
 
 <br /> 
 
-### Add vehicle
+#### Add vehicle
 To add a new simulated vehicle click the add drone button, then the copy button and paste the command into cygwin and click connect. 
 
 ![alt text](https://github.com/95danlos/Multi-Robot-Mission-Planner/blob/master/Images/MissionPlanner_img_1.png)
@@ -102,7 +102,7 @@ sim_vehicle.py -L KSFO -I 1
 
 <br /> 
 
-### Define Tasks
+#### Define Tasks
 The panel at the right side of the screen lets you define tasks. So far there are three types of tasks. Line task makes a vehicle fly from one point to another. Pickup task is the same as line but with an associated weight. Search task makes the vehicle move over the defined area.
 
 Obstacles can also be defined. The vehicles will try to find the shortest path around the obstacles. The algorithm is not optimized yet, and to many obstacles will result in a crash due to python max recursion depth error when calculating the path.
@@ -112,7 +112,7 @@ Obstacles can also be defined. The vehicles will try to find the shortest path a
 <br /> 
 
 
-### Flight Data and Vehicle Parameters
+#### Flight Data and Vehicle Parameters
 In the flight data window sensor data for each vehicle is displayed. It is also possible to change the parameters for each vehicle, like flight speed.
 
 ![alt text](https://github.com/95danlos/Multi-Robot-Mission-Planner/blob/master/Images/MissionPlanner_img_2.png)
