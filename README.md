@@ -76,7 +76,7 @@ make sitl -j4
 This section describes how to use the mission planner.
 
 
-### Add vehicle
+### Add vehicles
 To add a new simulated vehicle click the add drone button, then the copy button and paste the command into cygwin and click connect. 
 
 ![alt text](https://github.com/95danlos/Multi-Robot-Mission-Planner/blob/master/Images/MissionPlanner_img_1.png)
@@ -97,6 +97,12 @@ Cygwin terminal 2
 cd ~/ardupilot/ArduCopter  
 sim_vehicle.py -L KSFO -I 1
 ```
+
+Then start the Mission Planner with the number of vehicles you have
+```
+python Mission_Planner.py 2
+```
+
 
 <br /> 
 
