@@ -72,9 +72,59 @@ make sitl -j4
 
 <br /> 
 
+## How to use
+This section describes how to use the mission planner.
+
+
+<br /> 
+
+### Add vehicle
+To add a new simulated vehicle click the add drone button, then the copy button and paste the command into cygwin and click connect. 
+
+![alt text](https://github.com/95danlos/Multi-Robot-Mission-Planner/blob/master/Images/MissionPlanner_img_1.png)
+
+<br /> 
+
+
+Alternatively you can startup the vehicles manually by navigating to ArduCopter in Cygwin and start the simulation.
+
+
+Cygwin terminal 1
+cd ~/ardupilot/ArduCopter  
+sim_vehicle.py -L KSFO -I 0
+
+
+Cygwin terminal 2
+cd ~/ardupilot/ArduCopter  
+sim_vehicle.py -L KSFO -I 1
+
+
+<br /> 
+
 ### Define Tasks
-The panel at the right side of the screen lets you define tasks. So far there are three types of tasks. Line task makes a vehicle fly from one point to another. Pickup task is the same as line but with an assosiated weight. Search task makes the vehicle move over the defined area.
+The panel at the right side of the screen lets you define tasks. So far there are three types of tasks. Line task makes a vehicle fly from one point to another. Pickup task is the same as line but with an associated weight. Search task makes the vehicle move over the defined area.
 
 Obstacles can also be defined. The vehicles will try to find the shortest path around the obstacles. The algorithm is not optimized yet, and to many obstacles will result in a crash due to python max recursion depth error when calculating the path.
 
+![alt text](https://github.com/95danlos/Multi-Robot-Mission-Planner/blob/master/Images/MissionPlanner_img_5.png)
+
+<br /> 
+
+
+### Flight Data and Vehicle Parameters
+In the flight data window sensor data for each vehicle is displayed. It is also possible to change the parameters for each vehicle, like flight speed.
+
+![alt text](https://github.com/95danlos/Multi-Robot-Mission-Planner/blob/master/Images/MissionPlanner_img_2.png)
+![alt text](https://github.com/95danlos/Multi-Robot-Mission-Planner/blob/master/Images/MissionPlanner_img_3.png)
+
+
+<br /> 
+
+### Future work
+As for future work on the mission planner, more types of tasks can be add, and more parameters which can be used when deciding which vehicle should take which task.
+To be able to decide which vehicle can complete a specific task fastest, speed and acceleration should also be taken into account, which can be difficult for search tasks where there is a lot of turning. The obstacle avoidance algorithm also needs some adjustments.
+
+Adaptive planning can also be implemented, where tasks are reallocated between the vehicles if something happens or new tasks or vehicles are added in the middle of a mission. Collision avoidance between the vehicles should also be taken into account when planning the path. Precedence and temporal constraints can also be added, where one can specify which tasks needs to be  completed before other tasks or within a time limit.
+
+Testing with more types of different vehicle should be done. This should be easy since Ardupilot supports a number of different vehicles. And testing the mission planner with real vehicles should also be done.
 
