@@ -68,3 +68,13 @@ In a new Cygwin terminal navigate to the ArduCopter directory and run make.
 cd ~/ardupilot/ArduCopter
 make sitl -j4
 ```
+
+
+<br /> 
+
+### Define Tasks
+The panel at the right side of the screen lets you define tasks. So far there are three types of tasks. Line task makes a vehicle fly from one point to another. Pickup task is the same as line but with an assosiated weight. Search task makes the vehicle move over the defined area.
+
+Obstacles can also be defined. The vehicles will try to find the shortest path around the obstacles. The algorithm is not optimized yet, and to many obstacles will result in a crash due to python max recursion depth error when calculating the path.
+
+
