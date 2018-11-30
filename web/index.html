@@ -222,7 +222,7 @@ I (Joram Brenz) just put it together and made it work with the MultiDroneCoordin
 					startpos = npos;
 				}
 				else {
-					var line = L.polyline([startpos, npos], {color:'purple'});
+					var line = L.polyline([startpos, npos], {color:'blue'});
 					var weight = document.getElementById("pickupTask_weight_value").value;
 					line.addTo(mymap).bindTooltip(weight, { permanent: true, interactive: true });
 
