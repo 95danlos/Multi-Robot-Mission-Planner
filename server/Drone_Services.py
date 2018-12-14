@@ -411,7 +411,7 @@ def calculate_distance_path_from_corner_anti_clockwise(corner_nr, task, obstacle
 		if new_obstacle == None:
 			return distance(corner, task[0]), []
 		else:
-			return calculate_distance_path_around_obstacle(corner, task, new_obstacle)
+			return calculate_distance_path_around_obstacle(corner, task, new_obstacle, obstacles)
 	else:
 		distance_from_next_corner, path_from_next_corner = calculate_distance_path_from_corner_anti_clockwise((corner_nr-1) % 4, task, obstacle_with_offset, obstacles)
 		distance_around_obstacle_anti_clockwise = distance(corner, obstacle_with_offset[(corner_nr-1) % 4]) + distance_from_next_corner
